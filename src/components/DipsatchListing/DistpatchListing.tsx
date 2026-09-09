@@ -129,7 +129,7 @@ const DistpatchListing = ({ listing }: { listing: DispatchListingProps; }) => {
                             <div className='text-[12px] text-[rgb(109,109,109)]'>Vehicle Info</div>
                             <div>
                                 {listing.vehicleInfo.length > 0 &&
-                                    <ul>
+                                    <ul className='flex flex-col items-start'>
                                         {listing.vehicleInfo.map((vehicle, key) => (
                                             <li key={key}>
                                                 {vehicle.year} {vehicle.make} {vehicle.model}
