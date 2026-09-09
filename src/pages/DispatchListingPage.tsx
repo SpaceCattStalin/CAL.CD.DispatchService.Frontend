@@ -37,7 +37,7 @@ const mockListing = {
 const DispatchListingPage = () => {
   const [form] = Form.useForm<DispatchSearchFilters>();
 
-  const handleSearch = (_values: DispatchSearchFilters) => {
+  const handleSearch = () => {
     // TODO: fetch/filter listings using _values
   };
 
@@ -47,17 +47,14 @@ const DispatchListingPage = () => {
   };
 
   return (
-    <div className='flex flex-col gap-3 p-4'>
-
-      <Layout>
-        <Sider width="25%" className='text-center leading-32 text-black'>
-          <SearchFilters form={form} onFinish={handleSearch} onReset={handleReset} />
-        </Sider>
-        <Content className='text-center min-h-32 p-4'>
-          <DispatchListing listing={mockListing} />
-        </Content>
-      </Layout>
-    </div>
+    <Layout>
+      <Sider width="15%" className='text-center leading-32 text-black'>
+        <SearchFilters form={form} onFinish={handleSearch} onReset={handleReset} />
+      </Sider>
+      <Content className='text-center min-h-32 p-4'>
+        <DispatchListing listing={mockListing} />
+      </Content>
+    </Layout>
   );
 };
 
