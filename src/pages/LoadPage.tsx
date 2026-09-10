@@ -1,18 +1,31 @@
-import { Form, Layout } from 'antd';
-import SearchFilters from '../components/DipsatchListing/SearchFilters';
-import type { DispatchSearchFilters } from '../components/DipsatchListing/SearchFilters';
+import React from 'react';
+import Load from '../components/Load/Load';
+import type { LoadProps } from '../components/Load/Load';
+import { Layout, Form } from 'antd';
+import SearchFilters, { type DispatchSearchFilters } from '../components/DipsatchListing/SearchFilters';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
-import type { DispatchListingProps } from '../components/DipsatchListing/DistpatchListing';
-import DispatchListing from '../components/DipsatchListing/DistpatchListing';
 
-const mockListing = {
+const mockLoad = {
   dispatchId: 'DSP-1001',
   dispatchStatus: 'Listed',
   pickupLocation: 'Los Angeles, CA',
   pickupDate: new Date('2026-09-10'),
   dropoffLocation: 'Denver, CO',
   dropoffDate: new Date('2026-09-13'),
+  carrierInfo: {
+    companyId: 'CAR-2001',
+    type: 'Carrier',
+    companyName: 'Swift Auto Transport',
+    companyPhone: '(555) 123-4567',
+    companyEmail: 'dispatch@swiftautotransport.com',
+  },
+  driverInfo: {
+    userId: 'USR-3001',
+    fullName: 'John Doe',
+    phone: '(555) 987-6543',
+    email: 'john.doe@swiftautotransport.com',
+  },
   vehicleInfo: [
     {
       year: 2020,
@@ -32,9 +45,9 @@ const mockListing = {
   listingCreatedAt: new Date('2026-09-01'),
   listingUpdatedAt: new Date('2026-09-05'),
   price: 850,
-} satisfies DispatchListingProps;
+} satisfies LoadProps;
 
-const DispatchListingPage = () => {
+const LoadPage = () => {
   const [form] = Form.useForm<DispatchSearchFilters>();
 
   const handleSearch = () => {
@@ -45,17 +58,16 @@ const DispatchListingPage = () => {
     form.resetFields();
     // TODO: reset listings back to unfiltered state
   };
-
   return (
     <Layout>
       <Sider width="20%" className='h-screen text-center leading-32 text-black'>
         <SearchFilters form={form} onFinish={handleSearch} onReset={handleReset} />
       </Sider>
-      <Content className='text-center min-h-32 p-4'>
-        <DispatchListing listing={mockListing} />
+      <Content className='p-4'>
+        <Load load={mockLoad} />
       </Content>
     </Layout>
   );
 };
 
-export default DispatchListingPage;
+export default LoadPage;
