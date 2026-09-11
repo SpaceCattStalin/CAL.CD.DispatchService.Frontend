@@ -3,11 +3,9 @@ import type { FormInstance } from 'antd';
 import { createStaticStyles } from 'antd-style';
 import { SearchOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
+import type { DispatchStatus } from '../../types/Dispatch';
 
 const { RangePicker } = DatePicker;
-
-// Mirrors Domain.DispatchStatus (backend), serialized as strings via JsonStringEnumConverter.
-export type DispatchStatus = 'NotSigned' | 'PendingPickup' | 'PendingDelivery' | 'Delivered' | 'Canceled';
 
 const DISPATCH_STATUS_OPTIONS: { label: string; value: DispatchStatus; }[] = [
     { label: 'Not Signed', value: 'NotSigned' },
@@ -27,15 +25,8 @@ export type DispatchSearchFilters = {
     vin?: string;
 };
 
-export type SearchFiltersProps = {
-    form: FormInstance<DispatchSearchFilters>;
-    onFinish: (values: DispatchSearchFilters) => void;
-    onReset: () => void;
-};
-
-const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
-    const collapseClassNames = createStaticStyles(({ css }) => ({
-        root: css`
+const collapseClassNames = createStaticStyles(({ css }) => ({
+    root: css`
             background-color: transparent;
             border: 0;
             border-radius: 0;
@@ -45,7 +36,7 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                 border-top: 0;
             }
         `,
-        header: css`
+    header: css`
             padding: 6px 20px !important;
             
             border-radius: 0 !important;
@@ -54,23 +45,23 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                 background-color: #EBF6FF;
             }
         `,
-        title: css`
+    title: css`
             color: rgb(0, 91, 168);
             padding: 0 !important;
             font-weight: 500;
             text-align: left;
         `,
-        icon: css`
+    icon: css`
             padding: 0 !important;
             color: rgb(0, 91, 168);
         `,
-        body: css`
+    body: css`
             padding: 4px 0 0px 20px !important;
         `
-    }));
+}));
 
-    const inputClassNames = createStaticStyles(({ css }) => ({
-        root: css`
+const inputClassNames = createStaticStyles(({ css }) => ({
+    root: css`
             position: relative;
             background-color: transparent;
             border: 1px solid #6a7282;
@@ -101,7 +92,7 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                 box-shadow: none;
             }
         `,
-        suffix: css`
+    suffix: css`
             display: flex;
             align-items: center;
 
@@ -113,12 +104,12 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                 cursor: pointer;
             }
         `
-    }));
+}));
 
-    const fieldLabelClassName = 'text-[10px] text-[rgb(109,109,109)]';
+const fieldLabelClassName = 'text-[10px] text-[rgb(109,109,109)]';
 
-    const numberClassNames = createStaticStyles(({ css }) => ({
-        root: css`
+const numberClassNames = createStaticStyles(({ css }) => ({
+    root: css`
             position: relative;
             background-color: transparent;
             border: 1px solid #6a7282;
@@ -154,14 +145,14 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                 opacity: 1;
             }
         `,
-        prefix: css`
+    prefix: css`
             color: #6a7282;
             margin-right: 4px;
         `
-    }));
+}));
 
-    const rangePickerClassNames = createStaticStyles(({ css }) => ({
-        root: css`
+const rangePickerClassNames = createStaticStyles(({ css }) => ({
+    root: css`
             position: relative;
             background-color: transparent;
             border: 1px solid #6a7282;
@@ -203,22 +194,22 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                 justify-content: center;
             }
         `
-    }));
+}));
 
+type SearchFiltersProps = {
+    form: FormInstance<DispatchSearchFilters>;
+    onFinish: (values: DispatchSearchFilters) => void;
+    onReset: () => void;
+};
 
-    // const buttonClassNames = createStaticStyles(({ css }) => ({
-    //     root: css`
-    //         background-color: rgb(0, 91, 168);
-    //         :hover {
-    //             background-color: #2372B8 !important;
-    //             transition: all;
-    //         }
-    //     `
-    // }));
-
+const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
     return (
-        <div className='flex flex-col border-r border-r-gray-400 h-full'>
-            <Form form={form} layout='vertical' onFinish={onFinish}>
+        <div className='flex flex-col border-r border-r-gray-400 min-h-full'>
+            <Form
+                form={form}
+                layout='vertical'
+                onValuesChange={(_, allValues) => onFinish(allValues)}
+            >
                 <div className='px-3 pt-2 border-b border-b-gray-400'>
                     <Collapse
                         classNames={collapseClassNames}
