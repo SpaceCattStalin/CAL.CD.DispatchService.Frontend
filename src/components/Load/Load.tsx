@@ -58,7 +58,7 @@ const Load = ({ load }: { load: LoadProps; }) => {
 
             </div>
             <div className='flex gap-2 items-center p-2'>
-                <div className='text-[rgb(0,91,168)] font-bold text-[18px]'>
+                <div className='text-[#003468] font-bold text-[18px]'>
                     {load.dispatchId}
                 </div>
                 <div>
@@ -71,7 +71,7 @@ const Load = ({ load }: { load: LoadProps; }) => {
             </div>
             <div className='grid grid-cols-4 p-2'>
                 <div className='flex flex-col'>
-                    <div className='text-[rgb(0,91,168)] font-bold'>
+                    <div className='text-[#003468] font-bold'>
                         Dispatch Info
                     </div>
                     <div>
@@ -86,7 +86,7 @@ const Load = ({ load }: { load: LoadProps; }) => {
                     </div>
                 </div>
                 <div className='flex flex-col'>
-                    <div className='text-[rgb(0,91,168)] font-bold'>
+                    <div className='text-[#003468] font-bold'>
                         Load Info
                     </div>
                     <div>
@@ -103,7 +103,7 @@ const Load = ({ load }: { load: LoadProps; }) => {
                                 </ul>
                             }
                         </div>
-                        <div className='text-[rgb(0,91,168)] font-bold'>
+                        <div className='text-[#003468] font-bold'>
                             View all details
                         </div>
                     </div>
@@ -115,19 +115,19 @@ const Load = ({ load }: { load: LoadProps; }) => {
                     </div>
                 </div>
                 <div className='flex flex-col'>
-                    <div className='text-[rgb(0,91,168)] font-bold'>
+                    <div className='text-[#003468] font-bold'>
                         Origin
                     </div>
                     <div className='text-[18px] text-black'>{load.pickupLocation}</div>
                 </div>
                 <div className='flex flex-col'>
-                    <div className='text-[rgb(0,91,168)] font-bold'>
+                    <div className='text-[#003468] font-bold'>
                         Destination
                     </div>
                     <div className='text-[18px] text-black'>{load.dropoffLocation}</div>
                 </div>
             </div>
-            <div className='flex items-center px-1 justify-end bg-gray-200 py-2 px-4'>
+            <div className='flex items-center justify-end bg-gray-200 py-2 px-4'>
                 <div className='flex gap-1'>
                     <Button type='primary' classNames={buttonClassNames}>Assign</Button>
                 </div>

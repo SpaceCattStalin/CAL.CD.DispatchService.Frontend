@@ -1,49 +1,45 @@
-import { Form, Layout } from 'antd';
+import { useEffect, useState } from 'react';
+import { Form, Layout, Spin, Empty } from 'antd';
 import SearchFilters from '../components/DipsatchListing/SearchFilters';
 import type { DispatchSearchFilters } from '../components/DipsatchListing/SearchFilters';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
 import type { DispatchListingProps } from '../components/DipsatchListing/DistpatchListing';
 import DispatchListing from '../components/DipsatchListing/DistpatchListing';
-
-const mockListing = {
-  dispatchId: 'DSP-1001',
-  dispatchStatus: 'Listed',
-  pickupLocation: 'Los Angeles, CA',
-  pickupDate: new Date('2026-09-10'),
-  dropoffLocation: 'Denver, CO',
-  dropoffDate: new Date('2026-09-13'),
-  vehicleInfo: [
-    {
-      year: 2020,
-      make: 'Toyota',
-      model: 'Camry',
-      color: 'Red',
-      vin: '4T1BF1FK5CU123456',
-    },
-    {
-      year: 2019,
-      make: 'Honda',
-      model: 'Civic',
-      color: 'Blue',
-      vin: '2HGFC2F59KH123456',
-    },
-  ],
-  listingCreatedAt: new Date('2026-09-01'),
-  listingUpdatedAt: new Date('2026-09-05'),
-  price: 850,
-} satisfies DispatchListingProps;
+// import { getAllDispatches } from '../services/dispatchService';
+import { filterDispatches } from '../utils/filterDispatches';
 
 const DispatchListingPage = () => {
   const [form] = Form.useForm<DispatchSearchFilters>();
+  const [allDispatches, setAllDispatches] = useState<DispatchListingProps[]>([]);
+  const [visibleDispatches, setVisibleDispatches] = useState<DispatchListingProps[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleSearch = () => {
-    // TODO: fetch/filter listings using _values
+  // useEffect(() => {
+  //   let cancelled = false;
+
+  //   getAllDispatches()
+  //     .then((dispatches) => {
+  //       if (cancelled) return;
+  //       setAllDispatches(dispatches);
+  //       setVisibleDispatches(dispatches);
+  //     })
+  //     .finally(() => {
+  //       if (!cancelled) setLoading(false);
+  //     });
+
+  //   return () => {
+  //     cancelled = true;
+  //   };
+  // }, []);
+
+  const handleSearch = (values: DispatchSearchFilters) => {
+    // setVisibleDispatches(filterDispatches(allDispatches, values));
   };
 
   const handleReset = () => {
     form.resetFields();
-    // TODO: reset listings back to unfiltered state
+    setVisibleDispatches(allDispatches);
   };
 
   return (
@@ -52,7 +48,17 @@ const DispatchListingPage = () => {
         <SearchFilters form={form} onFinish={handleSearch} onReset={handleReset} />
       </Sider>
       <Content className='text-center min-h-32 p-4'>
-        <DispatchListing listing={mockListing} />
+        {loading ? (
+          <Spin />
+        ) : visibleDispatches.length === 0 ? (
+          <Empty description='No dispatches found' />
+        ) : (
+          <div className='flex flex-col gap-3'>
+            {visibleDispatches.map((listing) => (
+              <DispatchListing key={listing.dispatchId} listing={listing} />
+            ))}
+          </div>
+        )}
       </Content>
     </Layout>
   );

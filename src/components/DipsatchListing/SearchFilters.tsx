@@ -3,10 +3,9 @@ import type { FormInstance } from 'antd';
 import { createStaticStyles } from 'antd-style';
 import { SearchOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
+import type { DispatchStatus } from '../../types/Dispatch';
 
 const { RangePicker } = DatePicker;
-
-export type DispatchStatus = 'NotSigned' | 'PendingPickup' | 'PendingDelivery' | 'Delivered' | 'Canceled';
 
 const DISPATCH_STATUS_OPTIONS: { label: string; value: DispatchStatus; }[] = [
     { label: 'Not Signed', value: 'NotSigned' },
@@ -25,6 +24,7 @@ export type DispatchSearchFilters = {
     priceMax?: number;
     vin?: string;
 };
+
 const collapseClassNames = createStaticStyles(({ css }) => ({
     root: css`
             background-color: transparent;
@@ -203,19 +203,13 @@ type SearchFiltersProps = {
 };
 
 const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
-    // const buttonClassNames = createStaticStyles(({ css }) => ({
-    //     root: css`
-    //         background-color: rgb(0, 91, 168);
-    //         :hover {
-    //             background-color: #2372B8 !important;
-    //             transition: all;
-    //         }
-    //     `
-    // }));
-
     return (
         <div className='flex flex-col border-r border-r-gray-400 min-h-full'>
-            <Form form={form} layout='vertical' onFinish={onFinish}>
+            <Form
+                form={form}
+                layout='vertical'
+                onValuesChange={(_, allValues) => onFinish(allValues)}
+            >
                 <div className='px-3 pt-2 border-b border-b-gray-400'>
                     <Collapse
                         classNames={collapseClassNames}

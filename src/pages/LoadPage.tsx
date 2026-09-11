@@ -1,70 +1,79 @@
-import React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Load from '../components/Load/Load';
 import type { LoadProps } from '../components/Load/Load';
-import { Layout, Form } from 'antd';
+import { Layout, Form, Spin, Empty } from 'antd';
 import SearchFilters, { type DispatchSearchFilters } from '../components/DipsatchListing/SearchFilters';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
-
-const mockLoad = {
-  dispatchId: 'DSP-1001',
-  dispatchStatus: 'Listed',
-  pickupLocation: 'Los Angeles, CA',
-  pickupDate: new Date('2026-09-10'),
-  dropoffLocation: 'Denver, CO',
-  dropoffDate: new Date('2026-09-13'),
-  carrierInfo: {
-    companyId: 'CAR-2001',
-    type: 'Carrier',
-    companyName: 'Swift Auto Transport',
-    companyPhone: '(555) 123-4567',
-    companyEmail: 'dispatch@swiftautotransport.com',
-  },
-  driverInfo: {
-    userId: 'USR-3001',
-    fullName: 'John Doe',
-    phone: '(555) 987-6543',
-    email: 'john.doe@swiftautotransport.com',
-  },
-  vehicleInfo: [
-    {
-      year: 2020,
-      make: 'Toyota',
-      model: 'Camry',
-      color: 'Red',
-      vin: '4T1BF1FK5CU123456',
-    },
-    {
-      year: 2019,
-      make: 'Honda',
-      model: 'Civic',
-      color: 'Blue',
-      vin: '2HGFC2F59KH123456',
-    },
-  ],
-  listingCreatedAt: new Date('2026-09-01'),
-  listingUpdatedAt: new Date('2026-09-05'),
-  price: 850,
-} satisfies LoadProps;
+import { getDispatchBatch, buildDispatchSearchRequest } from '../services/dispatchService';
+import { debounce } from '../utils/debounce';
 
 const LoadPage = () => {
   const [form] = Form.useForm<DispatchSearchFilters>();
+  const [allDispatches, setAllDispatches] = useState<LoadProps[]>([]);
+  const [visibleDispatches, setVisibleDispatches] = useState<LoadProps[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleSearch = () => {
-    // TODO: fetch/filter listings using _values
+  useEffect(() => {
+    let cancelled = false;
+
+    getDispatchBatch(buildDispatchSearchRequest({}))
+      .then((dispatches) => {
+        if (cancelled) return;
+        setAllDispatches(dispatches);
+        setVisibleDispatches(dispatches);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((values: DispatchSearchFilters) => {
+        setLoading(true);
+
+        getDispatchBatch(buildDispatchSearchRequest(values))
+          .then((data) => setVisibleDispatches(data))
+          .finally(() => setLoading(false));
+      }, 1000),
+    []
+  );
+
+  const handleSearch = (values: DispatchSearchFilters) => {
+    debouncedSearch(values);
   };
 
   const handleReset = () => {
     form.resetFields();
-    // TODO: reset listings back to unfiltered state
+    setVisibleDispatches(allDispatches);
   };
+
   return (
     <Layout>
       <Sider width="20%" className='h-screen text-center leading-32 text-black'>
         <SearchFilters form={form} onFinish={handleSearch} onReset={handleReset} />
       </Sider>
       <Content className='p-4'>
-        <Load load={mockLoad} />
+        {loading ? (
+          <div className='flex items-center justify-center self-stretch h-full'>
+            <Spin size='large' />
+          </div>
+        ) : visibleDispatches.length === 0 ? (
+          <div className='flex items-center justify-center self-stretch h-full'>
+            <Empty description='No dispatches found' />
+          </div>
+        ) : (
+          <div className='flex flex-col gap-3'>
+            {visibleDispatches.map((load) => (
+              <Load key={load.dispatchId} load={load} />
+            ))}
+          </div>
+        )}
       </Content>
     </Layout>
   );
