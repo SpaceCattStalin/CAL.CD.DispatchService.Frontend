@@ -4,6 +4,7 @@ import { createStaticStyles } from 'antd-style';
 import { SearchOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import type { DispatchStatus } from '../../types/Dispatch';
+import { inputClassNames, numberClassNames, collapseClassNames } from './inputStyles';
 
 const { RangePicker } = DatePicker;
 
@@ -25,131 +26,7 @@ export type DispatchSearchFilters = {
     vin?: string;
 };
 
-const collapseClassNames = createStaticStyles(({ css }) => ({
-    root: css`
-            background-color: transparent;
-            border: 0;
-            border-radius: 0;
-            padding-top: 8px;
-            padding-bottom: 12px;
-            .ant-collapse-panel {
-                border-top: 0;
-            }
-        `,
-    header: css`
-            padding: 6px 20px !important;
-            
-            border-radius: 0 !important;
-
-            :hover{
-                background-color: #EBF6FF;
-            }
-        `,
-    title: css`
-            color: rgb(0, 91, 168);
-            padding: 0 !important;
-            font-weight: 500;
-            text-align: left;
-        `,
-    icon: css`
-            padding: 0 !important;
-            color: rgb(0, 91, 168);
-        `,
-    body: css`
-            padding: 4px 0 0px 20px !important;
-        `
-}));
-
-const inputClassNames = createStaticStyles(({ css }) => ({
-    root: css`
-            position: relative;
-            background-color: transparent;
-            border: 1px solid #6a7282;
-            border-radius: 4px;
-            box-sizing: border-box;
-            min-height: 30px;
-            align-items: stretch;
-
-            ::after {
-                content: '';
-                position: absolute;
-                inset: -4px;
-                border: 2px solid transparent;
-                border-radius: 6px;
-                pointer-events: none;
-                transition: border-color 0.15s;
-            }
-
-            :hover, 
-            :focus-within,
-            :focus {
-                border-color: #6a7282;
-            }
-         
-            :focus-within::after,
-            :focus::after {
-                border-color: rgb(0, 91, 168);
-                box-shadow: none;
-            }
-        `,
-    suffix: css`
-            display: flex;
-            align-items: center;
-
-            > *:last-child {
-                border-left: 0.5px solid #6a7282;
-                padding-left: 8px;
-                margin-left: 4px;
-                align-self: stretch;
-                cursor: pointer;
-            }
-        `
-}));
-
 const fieldLabelClassName = 'text-[10px] text-[rgb(109,109,109)]';
-
-const numberClassNames = createStaticStyles(({ css }) => ({
-    root: css`
-            position: relative;
-            background-color: transparent;
-            border: 1px solid #6a7282;
-            border-radius: 4px;
-            box-sizing: border-box;
-            min-height: 30px;
-            align-items: stretch;
-
-            ::after {
-                content: '';
-                position: absolute;
-                inset: -4px;
-                border: 2px solid transparent;
-                border-radius: 6px;
-                pointer-events: none;
-                transition: border-color 0.15s;
-            }
-
-            :hover,
-            :focus-within,
-            :focus {
-                border-color: #6a7282;
-            }
-
-            :focus-within::after,
-            :focus::after {
-                border-color: rgb(0, 91, 168);
-                box-shadow: none;
-            }
-
-            input::placeholder {
-                color: #9ca3af;
-                opacity: 1;
-            }
-        `,
-    prefix: css`
-            color: #6a7282;
-            margin-right: 4px;
-        `
-}));
 
 const rangePickerClassNames = createStaticStyles(({ css }) => ({
     root: css`
@@ -199,16 +76,23 @@ const rangePickerClassNames = createStaticStyles(({ css }) => ({
 type SearchFiltersProps = {
     form: FormInstance<DispatchSearchFilters>;
     onFinish: (values: DispatchSearchFilters) => void;
+    onDispatchIdChange: (value: string | undefined) => void;
     onReset: () => void;
 };
 
-const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
+const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFiltersProps) => {
     return (
         <div className='flex flex-col border-r border-r-gray-400 min-h-full'>
             <Form
                 form={form}
                 layout='vertical'
-                onValuesChange={(_, allValues) => onFinish(allValues)}
+                onValuesChange={(changedValues, allValues) => {
+                    if ('dispatchId' in changedValues) {
+                        return;
+                    } else {
+                        onFinish(allValues);
+                    }
+                }}
             >
                 <div className='px-3 pt-2 border-b border-b-gray-400'>
                     <Collapse
@@ -223,16 +107,44 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                                         <Input
                                             id='dispatchId'
                                             allowClear
+                                            onClear={() => onDispatchIdChange(undefined)}
                                             classNames={inputClassNames}
                                             placeholder='ID Number'
                                             size='small'
                                             suffix={
                                                 <SearchOutlined
                                                     style={{ color: '#005ba8', fontSize: 16 }}
+                                                    onClick={() => onDispatchIdChange(form.getFieldValue('dispatchId'))}
                                                 />}
                                         />
                                     </div>
                                 </Form.Item>
+                            ),
+                        }]}
+                    />
+                </div>
+
+                <div className='px-3 border-b border-b-gray-400'>
+                    <Collapse
+                        classNames={collapseClassNames}
+                        items={[{
+                            key: '1',
+                            label: 'Dates',
+                            children: (
+                                <div className='flex flex-col gap-2'>
+                                    <div className='flex flex-col items-start gap-0.5'>
+                                        <label htmlFor='pickupDateRange' className={fieldLabelClassName}>Pickup Date</label>
+                                        <Form.Item name='pickupDateRange' noStyle>
+                                            <RangePicker id='pickupDateRange' allowClear onClear={onReset} placement='bottomLeft' classNames={rangePickerClassNames} size='small' className='w-full' />
+                                        </Form.Item>
+                                    </div>
+                                    <div className='flex flex-col items-start gap-0.5'>
+                                        <label htmlFor='dropoffDateRange' className={fieldLabelClassName}>Drop-off Date</label>
+                                        <Form.Item name='dropoffDateRange' noStyle>
+                                            <RangePicker id='dropoffDateRange' allowClear onClear={onReset} placement='bottomLeft' classNames={rangePickerClassNames} size='small' className='w-full' />
+                                        </Form.Item>
+                                    </div>
+                                </div>
                             ),
                         }]}
                     />
@@ -252,31 +164,7 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                         }]}
                     />
                 </div>
-                <div className='px-3 border-b border-b-gray-400'>
-                    <Collapse
-                        classNames={collapseClassNames}
-                        items={[{
-                            key: '1',
-                            label: 'Dates',
-                            children: (
-                                <div className='flex flex-col gap-2'>
-                                    <Form.Item name='pickupDateRange' noStyle>
-                                        <div className='flex flex-col items-start gap-0.5'>
-                                            <label htmlFor='pickupDateRange' className={fieldLabelClassName}>Pickup Date</label>
-                                            <RangePicker id='pickupDateRange' classNames={rangePickerClassNames} size='small' className='w-full' />
-                                        </div>
-                                    </Form.Item>
-                                    <Form.Item name='dropoffDateRange' noStyle>
-                                        <div className='flex flex-col items-start gap-0.5'>
-                                            <label htmlFor='dropoffDateRange' className={fieldLabelClassName}>Drop-off Date</label>
-                                            <RangePicker id='dropoffDateRange' classNames={rangePickerClassNames} size='small' className='w-full' />
-                                        </div>
-                                    </Form.Item>
-                                </div>
-                            ),
-                        }]}
-                    />
-                </div>
+
                 <div className='px-3 border-b border-b-gray-400'>
                     <Collapse
                         classNames={collapseClassNames}
@@ -288,13 +176,13 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                                     <Form.Item name='priceMin' noStyle>
                                         <div className='flex flex-col items-start gap-0.5 w-full'>
                                             <label htmlFor='priceMin' className={fieldLabelClassName}>Min Price</label>
-                                            <InputNumber id='priceMin' classNames={numberClassNames} size='small' prefix='$' placeholder='Min' className='w-full' />
+                                            <InputNumber id='priceMin' classNames={numberClassNames} size='small' prefix='$' placeholder='Min' className='w-full' controls={false} />
                                         </div>
                                     </Form.Item>
                                     <Form.Item name='priceMax' noStyle>
                                         <div className='flex flex-col items-start gap-0.5 w-full'>
                                             <label htmlFor='priceMax' className={fieldLabelClassName}>Max Price</label>
-                                            <InputNumber id='priceMax' classNames={numberClassNames} size='small' prefix='$' placeholder='Max' className='w-full' />
+                                            <InputNumber id='priceMax' classNames={numberClassNames} size='small' prefix='$' placeholder='Max' className='w-full' controls={false} />
                                         </div>
                                     </Form.Item>
                                 </div>
@@ -315,6 +203,7 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                                         <Input
                                             id='vin'
                                             allowClear
+                                            onClear={onReset}
                                             classNames={inputClassNames}
                                             size='small'
                                             placeholder='Partial VIN match'
@@ -329,13 +218,8 @@ const SearchFilters = ({ form, onFinish }: SearchFiltersProps) => {
                         }]}
                     />
                 </div>
-
-                {/* <div className='flex justify-end gap-2 px-3 pt-3'>
-                    <Button onClick={onReset}>Reset</Button>
-                    <Button type='primary' htmlType='submit' classNames={buttonClassNames}>Search</Button>
-                </div> */}
-            </Form>
-        </div>
+            </Form >
+        </div >
     );
 };
 

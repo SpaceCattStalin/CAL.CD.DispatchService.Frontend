@@ -12,7 +12,7 @@ const AppHeader = () => {
         <div className='flex items-center h-full gap-8'>
             <img src={logo} alt='Logo' className='h-8 w-auto shrink-0' />
             <nav className='flex items-center h-full'>
-                <NavLink to='/' end className={tabClassName}>Listing</NavLink>
+                <NavLink to='/' end className={tabClassName}>Loads</NavLink> 
                 <NavLink to='/create' className={tabClassName}>Creating</NavLink>
             </nav>
         </div>

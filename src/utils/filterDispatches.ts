@@ -1,5 +1,5 @@
 import type { Dayjs } from 'dayjs';
-import type { DispatchSearchFilters } from '../components/DipsatchListing/SearchFilters';
+import type { DispatchSearchFilters } from '../components/common/SearchFilters';
 import type { LoadProps } from '../components/Load/Load';
 
 const isWithinDateRange = (date: Date, range?: [Dayjs, Dayjs]) => {

@@ -1,31 +1,34 @@
 import React from 'react';
-import type { StatusBadgeProps } from '../DipsatchListing/StatusBadge';
+import { useNavigate } from 'react-router-dom';
+import type { StatusBadgeProps } from '../common/StatusBadge';
 import type { Vehicle } from '../../types/Vehicle';
-import StatusBadge from '../DipsatchListing/StatusBadge';
+import type { Stop } from '../../types/Stop';
+import StatusBadge from '../common/StatusBadge';
 import { Button } from 'antd';
 import { createStaticStyles } from 'antd-style';
 
 export type LoadProps = {
     dispatchId: string,
     pickupLocation: string,
+    pickupStop: Stop,
     dispatchStatus: StatusBadgeProps['status'],
     pickupDate: Date,
     carrierInfo: Company,
     driverInfo: Driver,
     dropoffLocation: string,
+    dropoffStop: Stop,
     dropoffDate: Date,
     vehicleInfo: Vehicle[],
+    description?: string,
     listingCreatedAt: Date,
     listingUpdatedAt: Date,
     price: number;
 };
 
-type Company = {
-    companyId: string,
-    type: string,
-    companyName: string,
-    companyPhone: string,
-    companyEmail: string;
+export type Company = {
+    carrierCompanyName: string,
+    carrierCompanyPhone: string,
+    carrierCompanyEmail: string;
 };
 
 type Driver = {
@@ -50,8 +53,26 @@ const buttonClassNames = createStaticStyles(({ css }) => ({
         `
 }));
 
+const secondaryButtonClassNames = createStaticStyles(({ css }) => ({
+    root: css`
+            background-color: transparent;
+            border: 1px solid rgb(0, 91, 168);
+
+            :hover {
+                background-color: #EBF6FF !important;
+                border-color: #2372B8 !important;
+                transition: all;
+            }
+        `,
+    content: css`
+            color: rgb(0, 91, 168);
+        `
+}));
+
 
 const Load = ({ load }: { load: LoadProps; }) => {
+    const navigate = useNavigate();
+
     return (
         <div className='rounded-sm flex flex-col border border-gray-500'>
             <div>
@@ -80,9 +101,9 @@ const Load = ({ load }: { load: LoadProps; }) => {
                     </div>
                     <div className='flex flex-col'>
                         <div className='text-[12px] text-[rgb(109,109,109)]'>Carrier Info</div>
-                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.carrierInfo.companyName}</span>
-                        <span className='text-[14px] text-black'>{load.carrierInfo.companyEmail}</span>
-                        <span className='text-[14px] text-black'>{load.carrierInfo.companyPhone}</span>
+                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.carrierInfo.carrierCompanyName}</span>
+                        <span className='text-[14px] text-black'>{load.carrierInfo.carrierCompanyEmail}</span>
+                        <span className='text-[14px] text-black'>{load.carrierInfo.carrierCompanyPhone}</span>
                     </div>
                 </div>
                 <div className='flex flex-col'>
@@ -95,15 +116,24 @@ const Load = ({ load }: { load: LoadProps; }) => {
                         <div>
                             {load.vehicleInfo.length > 0 &&
                                 <ul className='flex flex-col items-start'>
-                                    {load.vehicleInfo.map((vehicle, key) => (
-                                        <li key={key}>
-                                            {vehicle.year} {vehicle.make} {vehicle.model}
-                                        </li>
-                                    ))}
+                                    {load.vehicleInfo.map((vehicle, index) => {
+                                        if (index < 4) {
+                                            return (
+                                                <li key={index}>
+                                                    {vehicle.vin.substring(0, 6)} {vehicle.year} {vehicle.make} {vehicle.model}
+                                                </li>
+                                            );
+                                        }
+                                        if (index === 4) {
+                                            return <li className='text-[#003468] font-bold' key={index}>+{load.vehicleInfo.length - 4} more</li>;
+                                        }
+                                        return null;
+                                    })}
                                 </ul>
                             }
                         </div>
-                        <div className='text-[#003468] font-bold'>
+                        <div className='text-[#003468] font-bold cursor-pointer'
+                            onClick={() => navigate(`/dispatch/${load.dispatchId}`)}>
                             View all details
                         </div>
                     </div>
@@ -129,6 +159,20 @@ const Load = ({ load }: { load: LoadProps; }) => {
             </div>
             <div className='flex items-center justify-end bg-gray-200 py-2 px-4'>
                 <div className='flex gap-1'>
+                    <Button
+                        type='default'
+                        classNames={secondaryButtonClassNames}
+                        onClick={() => navigate(`/dispatch/${load.dispatchId}`)}
+                    >
+                        Detail
+                    </Button>
+                    <Button
+                        type='default'
+                        classNames={secondaryButtonClassNames}
+                        onClick={() => navigate(`/dispatch/${load.dispatchId}/edit`)}
+                    >
+                        Edit
+                    </Button>
                     <Button type='primary' classNames={buttonClassNames}>Assign</Button>
                 </div>
             </div>

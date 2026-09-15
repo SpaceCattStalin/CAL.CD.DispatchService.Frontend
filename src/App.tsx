@@ -4,11 +4,6 @@ import { Layout, Flex, ConfigProvider } from 'antd';
 import AppHeader from './components/Layout/AppHeader';
 import AppFooter from './components/Layout/AppFooter';
 const { Header, Footer } = Layout;
-//import DispatchListingPage from './pages/DispatchListingPage';
-
-/// Need 2 sections first (3/7) with the 3-section the search section, and the 7-section
-/// the list section
-
 
 
 function App() {

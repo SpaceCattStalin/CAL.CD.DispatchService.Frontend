@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Form, Layout, Spin, Empty } from 'antd';
-import SearchFilters from '../components/DipsatchListing/SearchFilters';
-import type { DispatchSearchFilters } from '../components/DipsatchListing/SearchFilters';
+import SearchFilters from '../components/common/SearchFilters';
+import type { DispatchSearchFilters } from '../components/common/SearchFilters';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
 import type { DispatchListingProps } from '../components/DipsatchListing/DistpatchListing';

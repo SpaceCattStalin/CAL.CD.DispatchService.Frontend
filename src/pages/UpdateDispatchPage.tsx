@@ -1,0 +1,63 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Spin, Empty, message } from 'antd';
+import DispatchForm from '../components/common/DispatchForm';
+import type { DispatchFormValues } from '../components/common/DispatchForm';
+import type { LoadProps } from '../components/Load/Load';
+import { getSingleDispatch, updateDispatch, toUpdateDispatchRequest, toDispatchFormValues } from '../services/dispatchService';
+
+const UpdateDispatchPage = () => {
+    const { dispatchId } = useParams<{ dispatchId: string; }>();
+    return <UpdateDispatchPageContent key={dispatchId} dispatchId={dispatchId} />;
+};
+
+const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | undefined; }) => {
+    const navigate = useNavigate();
+    const [dispatch, setDispatch] = useState<LoadProps>();
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        getSingleDispatch(dispatchId)
+            .then((data) => { if (!cancelled) setDispatch(data); })
+            .finally(() => { if (!cancelled) setLoading(false); });
+        return () => { cancelled = true; };
+    }, [dispatchId]);
+
+    if (loading) {
+        return <div className='flex items-center justify-center h-full'><Spin size='large' /></div>;
+    }
+
+    if (!dispatch) {
+        return <div className='flex items-center justify-center h-full'><Empty description='Dispatch not found' /></div>;
+    }
+
+    const handleFinish = async (values: DispatchFormValues) => {
+        setSubmitting(true);
+        try {
+            await updateDispatch(dispatch.dispatchId, toUpdateDispatchRequest(values));
+            navigate('/');
+        } catch {
+            message.error('Failed to update dispatch');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    return (
+        <div className='flex flex-col gap-4 py-5 px-19'>
+            <h1 className='text-[28px] text-black font-bold'>Edit Dispatch</h1>
+            <DispatchForm
+                mode='update'
+                initialValues={toDispatchFormValues(dispatch)}
+                carrierInfo={dispatch.carrierInfo}
+                statusDisplay={dispatch.dispatchStatus}
+                submitting={submitting}
+                onFinish={handleFinish}
+            />
+        </div>
+    );
+};
+
+export default UpdateDispatchPage;

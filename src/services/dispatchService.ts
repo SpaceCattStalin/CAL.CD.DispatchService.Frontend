@@ -1,7 +1,10 @@
+import dayjs from "dayjs";
 import axiosInstance from "./axiosInstance";
 import type { DispatchStatus } from "../types/Dispatch";
 import type { LoadProps } from "../components/Load/Load";
-import type { DispatchSearchFilters } from "../components/DipsatchListing/SearchFilters";
+import type { DispatchSearchFilters } from "../components/common/SearchFilters";
+import type { DispatchFormValues } from "../components/common/DispatchForm";
+import type { Stop } from "../types/Stop";
 
 type StopResponse = {
     stopId: string;
@@ -48,6 +51,9 @@ type getDispatchResponse = {
     vehicles: VehicleResponse[];
     drivers: DriverResponse[];
     createdAt: string;
+    carrierCompanyName: string;
+    carrierCompanyPhone: string;
+    carrierCompanyEmail: string;
 };
 
 type getDispatchBatchResponse = {
@@ -102,28 +108,39 @@ export const getDispatchBatch = async (request: DispatchSearchRequestModel): Pro
 };
 
 export const getSingleDispatch = async (dispatchId: string | undefined): Promise<LoadProps> => {
-    const response = await axiosInstance.get<getDispatchResponse>(`/dispatch/${ dispatchId }`);
+    const response = await axiosInstance.get<getDispatchResponse>(`/dispatch/${dispatchId}`);
 
     return toLoadProps(response.data);
 };
 
+const toStop = (stop: StopResponse | null): Stop => ({
+    address: stop?.address ?? '',
+    locationName: stop?.locationName ?? undefined,
+    contactName: stop?.contactName ?? undefined,
+    contactPhone: stop?.contactPhone ?? undefined,
+    contactEmail: stop?.contactEmail ?? undefined,
+});
+
 const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
     const [firstDriver] = dispatch.drivers;
+    const pickupStop = toStop(dispatch.pickupStop);
+    const dropoffStop = toStop(dispatch.dropoffStop);
 
     return {
         dispatchId: dispatch.dispatchId,
-        pickupLocation: dispatch.pickupStop?.address ?? '',
+        pickupLocation: pickupStop.address,
+        pickupStop,
         dispatchStatus: dispatch.dispatchStatus,
         pickupDate: new Date(dispatch.pickupDate),
-        dropoffLocation: dispatch.dropoffStop?.address ?? '',
+        dropoffLocation: dropoffStop.address,
+        dropoffStop,
         dropoffDate: new Date(dispatch.dropoffDate),
+        description: dispatch.description ?? undefined,
         // Search only gives us the carrier's id, not its name/phone/email
         carrierInfo: {
-            companyId: dispatch.carrierId,
-            type: '',
-            companyName: '',
-            companyPhone: '',
-            companyEmail: '',
+            carrierCompanyName: dispatch.carrierCompanyName,
+            carrierCompanyPhone: dispatch.carrierCompanyPhone,
+            carrierCompanyEmail: dispatch.carrierCompanyEmail
         },
         // A dispatch can have multiple drivers; LoadProps only has room for one, so we take the first.
         driverInfo: firstDriver
@@ -135,6 +152,7 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
             }
             : { userId: '', fullName: '', phone: '', email: '' },
         vehicleInfo: dispatch.vehicles.map((vehicle) => ({
+            vehicleId: vehicle.vehicleId,
             year: vehicle.year,
             make: vehicle.make,
             model: vehicle.model,
@@ -147,3 +165,114 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
         price: dispatch.price,
     };
 };
+
+// --- Create / Update ---
+
+type StopRequest = {
+    address: string;
+    locationName?: string;
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+};
+
+type VehicleRequestCreate = {
+    vin?: string;
+    year: number;
+    make: string;
+    model: string;
+    color?: string;
+};
+
+type UpdateVehicleRequest = {
+    vehicleId: string;
+    vin?: string;
+    year?: number;
+    make?: string;
+    model?: string;
+    color?: string;
+};
+
+type CreateDispatchRequest = {
+    carrierId: string;
+    price: number;
+    pickupDate: string;
+    dropoffDate: string;
+    description?: string;
+    pickupStop: StopRequest;
+    dropoffStop: StopRequest;
+    vehicles: VehicleRequestCreate[];
+};
+
+// No carrierId, no dispatchStatus — the backend's PUT contract doesn't accept either
+// (carrier can't change on update; status is shown read-only until the backend adds support).
+type UpdateDispatchRequest = {
+    price: number;
+    pickupDate: string;
+    dropoffDate: string;
+    description?: string;
+    pickupStop: StopRequest;
+    dropoffStop: StopRequest;
+    vehicles: UpdateVehicleRequest[];
+};
+
+export const createDispatch = async (request: CreateDispatchRequest): Promise<LoadProps> => {
+    const response = await axiosInstance.post<getDispatchResponse>('/dispatch', request);
+    return toLoadProps(response.data);
+};
+
+export const updateDispatch = async (dispatchId: string, request: UpdateDispatchRequest): Promise<LoadProps> => {
+    const response = await axiosInstance.put<getDispatchResponse>(`/dispatch/${dispatchId}`, request);
+    return toLoadProps(response.data);
+};
+
+export const toCreateDispatchRequest = (values: DispatchFormValues): CreateDispatchRequest => ({
+    carrierId: values.carrierId!,
+    price: values.price,
+    pickupDate: values.pickupDate.toISOString(),
+    dropoffDate: values.dropoffDate.toISOString(),
+    description: values.description || undefined,
+    pickupStop: values.pickupStop,
+    dropoffStop: values.dropoffStop,
+    vehicles: values.vehicles.map((vehicle) => ({
+        vin: vehicle.vin || undefined,
+        year: vehicle.year!,
+        make: vehicle.make,
+        model: vehicle.model,
+        color: vehicle.color || undefined,
+    })),
+});
+
+export const toUpdateDispatchRequest = (values: DispatchFormValues): UpdateDispatchRequest => ({
+    price: values.price,
+    pickupDate: values.pickupDate.toISOString(),
+    dropoffDate: values.dropoffDate.toISOString(),
+    description: values.description || undefined,
+    pickupStop: values.pickupStop,
+    dropoffStop: values.dropoffStop,
+    vehicles: values.vehicles.map((vehicle) => ({
+        vehicleId: vehicle.vehicleId,
+        vin: vehicle.vin || undefined,
+        year: vehicle.year,
+        make: vehicle.make,
+        model: vehicle.model,
+        color: vehicle.color || undefined,
+    })),
+});
+
+export const toDispatchFormValues = (dispatch: LoadProps): Partial<DispatchFormValues> => ({
+    price: dispatch.price,
+    pickupDate: dayjs(dispatch.pickupDate),
+    dropoffDate: dayjs(dispatch.dropoffDate),
+    description: dispatch.description,
+    pickupStop: dispatch.pickupStop,
+    dropoffStop: dispatch.dropoffStop,
+    vehicles: dispatch.vehicleInfo.map((vehicle) => ({
+        vehicleId: vehicle.vehicleId ?? crypto.randomUUID(),
+        vin: vehicle.vin,
+        year: vehicle.year,
+        make: vehicle.make,
+        model: vehicle.model,
+        color: vehicle.color,
+    })),
+});
