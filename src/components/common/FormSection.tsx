@@ -11,17 +11,18 @@ export type FormSectionProps = {
     // Each entry is one row. A single field renders full-width;
     // an array of fields renders them side-by-side in that row (e.g. pickup/dropoff dates).
     fields: (FormSectionField | FormSectionField[])[];
+    className?: string;
 };
 
 const fieldLabelClassName = 'text-[12px] text-[rgb(109,109,109)]';
 
-const FormSection = ({ sectionName, fields }: FormSectionProps) => {
+const FormSection = ({ sectionName, fields, className = '' }: FormSectionProps) => {
     return (
-        <div className='rounded-sm flex flex-col border border-gray-500'>
+        <div className={`rounded-sm flex flex-col border border-gray-500 ${className} self-stretch h-full`}>
             <div className='text-[#003468] font-semibold bg-gray-200 py-2 px-3 text-[18px]'>
                 {sectionName}
             </div>
-            <div className='flex flex-col gap-1 px-3 pt-5 pb-8'>
+            <div className='flex flex-col gap-1 px-3 pt-5 pb-8 flex-1'>
                 {fields.map((row) => {
                     const items = Array.isArray(row) ? row : [row];
                     const rowKey = items.map((field) => field.key).join('-');

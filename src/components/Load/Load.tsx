@@ -72,7 +72,7 @@ const secondaryButtonClassNames = createStaticStyles(({ css }) => ({
 
 const Load = ({ load }: { load: LoadProps; }) => {
     const navigate = useNavigate();
-
+    console.log(load);
     return (
         <div className='rounded-sm flex flex-col border border-gray-500'>
             <div>

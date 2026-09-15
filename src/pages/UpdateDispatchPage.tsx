@@ -5,6 +5,7 @@ import DispatchForm from '../components/common/DispatchForm';
 import type { DispatchFormValues } from '../components/common/DispatchForm';
 import type { LoadProps } from '../components/Load/Load';
 import { getSingleDispatch, updateDispatch, toUpdateDispatchRequest, toDispatchFormValues } from '../services/dispatchService';
+import { LeftOutlined } from '@ant-design/icons';
 
 const UpdateDispatchPage = () => {
     const { dispatchId } = useParams<{ dispatchId: string; }>();
@@ -47,6 +48,15 @@ const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | undefi
 
     return (
         <div className='flex flex-col gap-4 py-5 px-19'>
+            <div className='flex items-center justify-between'>
+                <div
+                    className='flex items-center gap-1 w-fit text-[18px] text-[rgb(0,91,168)] cursor-pointer'
+                    onClick={() => navigate('/')}
+                >
+                    <LeftOutlined style={{ fontSize: 14 }} />
+                    <span>BACK TO DISPATCHES</span>
+                </div>
+            </div>
             <h1 className='text-[28px] text-black font-bold'>Edit Dispatch</h1>
             <DispatchForm
                 mode='update'

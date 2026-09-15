@@ -131,8 +131,11 @@ export const datePickerClassNames = createStaticStyles(({ css }) => ({
 export const selectClassNames = createStaticStyles(({ css }) => ({
     root: css`
             position: relative;
+            display: flex;
+            align-self: stretch;
             background-color: transparent;
             border-radius: 4px;
+            border: 1px solid #6a7282;
             box-sizing: border-box;
             min-height: 30px;
 

@@ -41,7 +41,7 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | undefined; }) 
             .finally(() => { if (!cancelled) setLoading(false); });
         return () => { cancelled = true; };
     }, [dispatchId]);
-
+    console.log(dispatch);
     if (loading) {
         return <div className='flex items-center justify-center h-full'><Spin size='large' /></div>;
     }
@@ -95,7 +95,7 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | undefined; }) 
                 sectionName='Pricing and Payment'
                 fields={[
                     { key: 'price', label: 'Price', input: <Input readOnly styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} value={`$${dispatch.price}`} classNames={valueInputClassNames} size='small' /> },
-                    { key: 'description', label: 'Description', input: <Input.TextArea readOnly autoSize={{ minRows: 2 }} value={dispatch.description || '—'} classNames={{ root: valueInputClassNames.root }} /> },
+                    { key: 'description', label: 'Description', input: <Input.TextArea readOnly autoSize={{ minRows: 2 }} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} value={dispatch.description || '—'} classNames={{ root: valueInputClassNames.root }} /> },
                 ]}
             />
             <FormSection

@@ -87,7 +87,7 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                 form={form}
                 layout='vertical'
                 onValuesChange={(changedValues, allValues) => {
-                    if ('dispatchId' in changedValues) {
+                    if ('dispatchId' in changedValues || 'vin' in changedValues) {
                         return;
                     } else {
                         onFinish(allValues);
@@ -99,11 +99,11 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                         classNames={collapseClassNames}
                         items={[{
                             key: '1',
-                            label: 'Listing',
+                            label: 'Load',
                             children: (
                                 <Form.Item name='dispatchId' noStyle>
                                     <div className='flex flex-col items-start gap-0.5'>
-                                        <label htmlFor='dispatchId' className='text-[10px] text-[rgb(109,109,109)]'>Listing ID</label>
+                                        <label htmlFor='dispatchId' className='text-[10px] text-[rgb(109,109,109)]'>Load ID</label>
                                         <Input
                                             id='dispatchId'
                                             allowClear
@@ -210,6 +210,7 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                                             suffix={
                                                 <SearchOutlined
                                                     style={{ color: '#005ba8', fontSize: 16 }}
+                                                    onClick={() => onFinish(form.getFieldsValue())}
                                                 />}
                                         />
                                     </div>

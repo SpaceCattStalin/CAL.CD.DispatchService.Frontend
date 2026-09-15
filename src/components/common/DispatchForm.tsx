@@ -53,7 +53,11 @@ const renderStopFields = (stopName: 'pickupStop' | 'dropoffStop') => [
     {
         key: `${stopName}-address`, label: 'Address', input: (
             <Form.Item name={[stopName, 'address']} rules={[{ required: true, message: 'Address is required' }]} noStyle>
-                <Input classNames={inputClassNames} size='small' placeholder='Address' />
+                <Input classNames={inputClassNames}
+                    size='small'
+                    placeholder='Address'
+                    suffix={<></>}
+                />
             </Form.Item>
         )
     },
@@ -61,14 +65,14 @@ const renderStopFields = (stopName: 'pickupStop' | 'dropoffStop') => [
         {
             key: `${stopName}-locationName`, label: 'Location Name', input: (
                 <Form.Item name={[stopName, 'locationName']} noStyle>
-                    <Input classNames={inputClassNames} size='small' placeholder='Location Name' />
+                    <Input classNames={inputClassNames} size='small' placeholder='Location Name' suffix={<></>} />
                 </Form.Item>
             )
         },
         {
             key: `${stopName}-contactName`, label: 'Contact Name', input: (
                 <Form.Item name={[stopName, 'contactName']} noStyle>
-                    <Input classNames={inputClassNames} size='small' placeholder='Contact Name' />
+                    <Input classNames={inputClassNames} size='small' placeholder='Contact Name' suffix={<></>} />
                 </Form.Item>
             )
         },
@@ -77,14 +81,14 @@ const renderStopFields = (stopName: 'pickupStop' | 'dropoffStop') => [
         {
             key: `${stopName}-contactPhone`, label: 'Contact Phone', input: (
                 <Form.Item name={[stopName, 'contactPhone']} noStyle>
-                    <Input classNames={inputClassNames} size='small' placeholder='Contact Phone' />
+                    <Input classNames={inputClassNames} size='small' placeholder='Contact Phone' suffix={<></>} />
                 </Form.Item>
             )
         },
         {
             key: `${stopName}-contactEmail`, label: 'Contact Email', input: (
                 <Form.Item name={[stopName, 'contactEmail']} noStyle>
-                    <Input classNames={inputClassNames} size='small' placeholder='Contact Email' />
+                    <Input classNames={inputClassNames} size='small' placeholder='Contact Email' suffix={<></>} />
                 </Form.Item>
             )
         },
@@ -109,7 +113,14 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
     }, [mode]);
 
     return (
-        <Form form={form} layout='vertical' initialValues={initialValues} onFinish={onFinish} className='flex flex-col gap-4'>
+        <Form
+            form={form}
+            layout='vertical'
+            initialValues={initialValues}
+            onFinish={onFinish}
+            onFinishFailed={({ errorFields }) => console.log('Form validation failed', errorFields)}
+            className='flex flex-col gap-4'
+        >
             <FormSection
                 sectionName='Carrier'
                 fields={
@@ -154,50 +165,56 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                 />
             )}
 
-            <FormSection
-                sectionName='Pricing and Dates'
-                fields={[
-                    {
-                        key: 'price', label: 'Price', input: (
-                            <Form.Item name='price' rules={[{ required: true, message: 'Price is required' }]} noStyle>
-                                <InputNumber classNames={numberClassNames} size='small' prefix='$' controls={false} className='w-full' placeholder='0' />
-                            </Form.Item>
-                        )
-                    },
-                    [
-                        {
-                            key: 'pickupDate', label: 'Pickup Date', input: (
-                                <Form.Item name='pickupDate' rules={[{ required: true, message: 'Pickup date is required' }]} noStyle>
-                                    <DatePicker classNames={datePickerClassNames} size='small' className='w-full' />
-                                </Form.Item>
-                            )
-                        },
-                        {
-                            key: 'dropoffDate', label: 'Dropoff Date', input: (
-                                <Form.Item name='dropoffDate' rules={[{ required: true, message: 'Dropoff date is required' }]} noStyle>
-                                    <DatePicker classNames={datePickerClassNames} size='small' className='w-full' />
-                                </Form.Item>
-                            )
-                        },
-                    ],
-                ]}
-            />
-
             <FormSection sectionName='Pick-Up Location' fields={renderStopFields('pickupStop')} />
             <FormSection sectionName='Delivery Location' fields={renderStopFields('dropoffStop')} />
+            
+            <div className='grid grid-cols-3 gap-2'>
+                <div className='col-span-1'>
 
-            <FormSection
-                sectionName='Description'
-                fields={[
-                    {
-                        key: 'description', label: 'Description', input: (
-                            <Form.Item name='description' noStyle>
-                                <Input.TextArea classNames={{ root: inputClassNames.root }} autoSize={{ minRows: 2 }} placeholder='Description' />
-                            </Form.Item>
-                        )
-                    },
-                ]}
-            />
+                    <FormSection
+                        sectionName='Pricing and Dates'
+                        fields={[
+                            {
+                                key: 'price', label: 'Price', input: (
+                                    <Form.Item name='price' rules={[{ required: true, message: 'Price is required' }]} noStyle>
+                                        <InputNumber classNames={numberClassNames} size='small' prefix='$' controls={false} className='w-full' placeholder='0' />
+                                    </Form.Item>
+                                )
+                            },
+                            [
+                                {
+                                    key: 'pickupDate', label: 'Pickup Date', input: (
+                                        <Form.Item name='pickupDate' rules={[{ required: true, message: 'Pickup date is required' }]} noStyle>
+                                            <DatePicker classNames={datePickerClassNames} size='small' className='w-full' />
+                                        </Form.Item>
+                                    )
+                                },
+                                {
+                                    key: 'dropoffDate', label: 'Dropoff Date', input: (
+                                        <Form.Item name='dropoffDate' rules={[{ required: true, message: 'Dropoff date is required' }]} noStyle>
+                                            <DatePicker classNames={datePickerClassNames} size='small' className='w-full' />
+                                        </Form.Item>
+                                    )
+                                },
+                            ],
+                        ]}
+                    />
+                </div>
+                <div className='col-span-2'>
+                    <FormSection
+                        sectionName='Description'
+                        fields={[
+                            {
+                                key: 'description', label: 'Description', input: (
+                                    <Form.Item name='description' noStyle>
+                                        <Input.TextArea classNames={{ root: inputClassNames.root }} autoSize={{ minRows: 2 }} placeholder='Description' allowClear />
+                                    </Form.Item>
+                                )
+                            },
+                        ]}
+                    />
+                </div>
+            </div>
 
             <FormSection
                 sectionName='Vehicle Information'
@@ -231,7 +248,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                                         />
                                                     ),
                                                     children: (
-                                                        <div className='flex flex-col gap-2'>
+                                                        <div className='flex flex-col gap-2 pb-5'>
                                                             <Form.Item name={[field.name, 'vehicleId']} hidden>
                                                                 <Input />
                                                             </Form.Item>
@@ -296,7 +313,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
 
             <div className='flex justify-end gap-2'>
                 <Button onClick={() => navigate('/')}>Cancel</Button>
-                <Button type='primary' htmlType='submit' loading={submitting}>
+                <Button type='primary' htmlType='submit' loading={submitting} onClick={() => console.log("Hello")}>
                     {mode === 'create' ? 'Create Dispatch' : 'Save Changes'}
                 </Button>
             </div>

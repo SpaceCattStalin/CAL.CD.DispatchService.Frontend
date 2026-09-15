@@ -48,8 +48,8 @@ type getDispatchResponse = {
     isSigned: boolean;
     pickupStop: StopResponse | null;
     dropoffStop: StopResponse | null;
-    vehicles: VehicleResponse[];
-    drivers: DriverResponse[];
+    vehicles: VehicleResponse[] | null;
+    drivers: DriverResponse[] | null;
     createdAt: string;
     carrierCompanyName: string;
     carrierCompanyPhone: string;
@@ -122,7 +122,7 @@ const toStop = (stop: StopResponse | null): Stop => ({
 });
 
 const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
-    const [firstDriver] = dispatch.drivers;
+    const [firstDriver] = dispatch.drivers ?? [];
     const pickupStop = toStop(dispatch.pickupStop);
     const dropoffStop = toStop(dispatch.dropoffStop);
 
@@ -136,13 +136,13 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
         dropoffStop,
         dropoffDate: new Date(dispatch.dropoffDate),
         description: dispatch.description ?? undefined,
-        // Search only gives us the carrier's id, not its name/phone/email
+
         carrierInfo: {
             carrierCompanyName: dispatch.carrierCompanyName,
             carrierCompanyPhone: dispatch.carrierCompanyPhone,
             carrierCompanyEmail: dispatch.carrierCompanyEmail
         },
-        // A dispatch can have multiple drivers; LoadProps only has room for one, so we take the first.
+
         driverInfo: firstDriver
             ? {
                 userId: firstDriver.driverId,
@@ -151,7 +151,7 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
                 email: firstDriver.email,
             }
             : { userId: '', fullName: '', phone: '', email: '' },
-        vehicleInfo: dispatch.vehicles.map((vehicle) => ({
+        vehicleInfo: (dispatch.vehicles ?? []).map((vehicle) => ({
             vehicleId: vehicle.vehicleId,
             year: vehicle.year,
             make: vehicle.make,
@@ -160,13 +160,11 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
             vin: vehicle.vin ?? '',
         })),
         listingCreatedAt: new Date(dispatch.createdAt),
-        // No separate "updated at" field exists on getDispatchResponse yet — falls back to createdAt.
         listingUpdatedAt: new Date(dispatch.createdAt),
         price: dispatch.price,
     };
 };
 
-// --- Create / Update ---
 
 type StopRequest = {
     address: string;
@@ -204,8 +202,6 @@ type CreateDispatchRequest = {
     vehicles: VehicleRequestCreate[];
 };
 
-// No carrierId, no dispatchStatus — the backend's PUT contract doesn't accept either
-// (carrier can't change on update; status is shown read-only until the backend adds support).
 type UpdateDispatchRequest = {
     price: number;
     pickupDate: string;
