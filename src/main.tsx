@@ -4,6 +4,10 @@ import './index.css';
 import App from './App.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DispatchListingPage from './pages/DispatchListingPage.tsx';
+import CreateDispatchPage from './pages/CreateDispatchPage.tsx';
+import UpdateDispatchPage from './pages/UpdateDispatchPage.tsx';
+import LoadPage from './pages/LoadPage.tsx';
+import DetailPage from './pages/DetailPage.tsx';
 
 
 const router = createBrowserRouter([
@@ -11,7 +15,10 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
     children: [
-      { index: true, element: <DispatchListingPage /> }
+      { index: true, element: <LoadPage /> },
+      { path: 'create', element: <CreateDispatchPage /> },
+      { path: 'dispatch/:dispatchId', element: <DetailPage /> },
+      { path: 'dispatch/:dispatchId/edit', element: <UpdateDispatchPage /> }
     ]
   }
 ]);
