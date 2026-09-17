@@ -43,7 +43,7 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
             .finally(() => { if (!cancelled) setLoading(false); });
         return () => { cancelled = true; };
     }, [dispatchId]);
-    console.log(dispatch);
+
     if (loading) {
         return <div className='flex items-center justify-center h-full'><Spin size='large' /></div>;
     }

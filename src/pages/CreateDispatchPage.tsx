@@ -12,8 +12,8 @@ const CreateDispatchPage = () => {
     const handleFinish = async (values: DispatchFormValues) => {
         setSubmitting(true);
         try {
-            await createDispatch(toCreateDispatchRequest(values));
-            navigate('/');
+            const { location } = await createDispatch(toCreateDispatchRequest(values));
+            navigate(location);
         } catch {
             message.error('Failed to create dispatch');
         } finally {

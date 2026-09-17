@@ -39,8 +39,8 @@ const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | null; 
     const handleFinish = async (values: DispatchFormValues) => {
         setSubmitting(true);
         try {
-            await updateDispatch(dispatch.dispatchId, toUpdateDispatchRequest(values));
-            navigate('/');
+            const { location } = await updateDispatch(dispatch.dispatchId, toUpdateDispatchRequest(values));
+            navigate(location);
         } catch {
             message.error('Failed to update dispatch');
         } finally {

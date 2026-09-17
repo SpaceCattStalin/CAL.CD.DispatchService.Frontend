@@ -216,14 +216,19 @@ type UpdateDispatchRequest = {
     vehicles: UpdateVehicleRequest[];
 };
 
-export const createDispatch = async (request: CreateDispatchRequest): Promise<LoadProps> => {
-    const response = await axiosInstance.post<getDispatchResponse>('/dispatch', request);
-    return toLoadProps(response.data);
+export type DispatchMutationResult = {
+    dispatch: LoadProps;
+    location: string;
 };
 
-export const updateDispatch = async (dispatchId: string, request: UpdateDispatchRequest): Promise<LoadProps> => {
+export const createDispatch = async (request: CreateDispatchRequest): Promise<DispatchMutationResult> => {
+    const response = await axiosInstance.post<getDispatchResponse>('/dispatch', request);
+    return { dispatch: toLoadProps(response.data), location: response.headers['location'] };
+};
+
+export const updateDispatch = async (dispatchId: string, request: UpdateDispatchRequest): Promise<DispatchMutationResult> => {
     const response = await axiosInstance.put<getDispatchResponse>(`/dispatch/${dispatchId}`, request);
-    return toLoadProps(response.data);
+    return { dispatch: toLoadProps(response.data), location: response.headers['location'] };
 };
 
 export const toCreateDispatchRequest = (values: DispatchFormValues): CreateDispatchRequest => ({
