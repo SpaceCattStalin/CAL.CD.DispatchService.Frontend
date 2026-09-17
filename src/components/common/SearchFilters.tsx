@@ -17,13 +17,13 @@ const DISPATCH_STATUS_OPTIONS: { label: string; value: DispatchStatus; }[] = [
 ];
 
 export type DispatchSearchFilters = {
-    dispatchId?: string;
-    status?: DispatchStatus[];
-    pickupDateRange?: [Dayjs, Dayjs];
-    dropoffDateRange?: [Dayjs, Dayjs];
-    priceMin?: number;
-    priceMax?: number;
-    vin?: string;
+    dispatchId: string | null;
+    status: DispatchStatus[] | null;
+    pickupDateRange: [Dayjs, Dayjs] | null;
+    dropoffDateRange: [Dayjs, Dayjs] | null;
+    priceMin: number | null;
+    priceMax: number | null;
+    vin: string | null;
 };
 
 const fieldLabelClassName = 'text-[10px] text-[rgb(109,109,109)]';
@@ -76,7 +76,7 @@ const rangePickerClassNames = createStaticStyles(({ css }) => ({
 type SearchFiltersProps = {
     form: FormInstance<DispatchSearchFilters>;
     onFinish: (values: DispatchSearchFilters) => void;
-    onDispatchIdChange: (value: string | undefined) => void;
+    onDispatchIdChange: (value: string) => void;
     onReset: () => void;
 };
 
@@ -101,13 +101,14 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                             key: '1',
                             label: 'Load',
                             children: (
-                                <Form.Item name='dispatchId' noStyle>
-                                    <div className='flex flex-col items-start gap-0.5'>
-                                        <label htmlFor='dispatchId' className='text-[10px] text-[rgb(109,109,109)]'>Load ID</label>
+                                <div className='flex flex-col items-start gap-0.5'>
+                                    <label htmlFor='dispatchId' className='text-[10px] text-[rgb(109,109,109)]'>Load ID</label>
+                                    <Form.Item name='dispatchId' noStyle>
+
                                         <Input
                                             id='dispatchId'
                                             allowClear
-                                            onClear={() => onDispatchIdChange(undefined)}
+                                            onClear={onReset}
                                             classNames={inputClassNames}
                                             placeholder='ID Number'
                                             size='small'
@@ -117,8 +118,8 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                                                     onClick={() => onDispatchIdChange(form.getFieldValue('dispatchId'))}
                                                 />}
                                         />
-                                    </div>
-                                </Form.Item>
+                                    </Form.Item>
+                                </div>
                             ),
                         }]}
                     />
@@ -173,18 +174,18 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                             label: 'Price',
                             children: (
                                 <div className='flex gap-2'>
-                                    <Form.Item name='priceMin' noStyle>
-                                        <div className='flex flex-col items-start gap-0.5 w-full'>
-                                            <label htmlFor='priceMin' className={fieldLabelClassName}>Min Price</label>
+                                    <div className='flex flex-col items-start gap-0.5 w-full'>
+                                        <label htmlFor='priceMin' className={fieldLabelClassName}>Min Price</label>
+                                        <Form.Item name='priceMin' noStyle>
                                             <InputNumber id='priceMin' classNames={numberClassNames} size='small' prefix='$' placeholder='Min' className='w-full' controls={false} />
-                                        </div>
-                                    </Form.Item>
-                                    <Form.Item name='priceMax' noStyle>
-                                        <div className='flex flex-col items-start gap-0.5 w-full'>
-                                            <label htmlFor='priceMax' className={fieldLabelClassName}>Max Price</label>
+                                        </Form.Item>
+                                    </div>
+                                    <div className='flex flex-col items-start gap-0.5 w-full'>
+                                        <label htmlFor='priceMax' className={fieldLabelClassName}>Max Price</label>
+                                        <Form.Item name='priceMax' noStyle>
                                             <InputNumber id='priceMax' classNames={numberClassNames} size='small' prefix='$' placeholder='Max' className='w-full' controls={false} />
-                                        </div>
-                                    </Form.Item>
+                                        </Form.Item>
+                                    </div>
                                 </div>
                             ),
                         }]}
@@ -197,9 +198,9 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                             key: '1',
                             label: 'Vehicle Vin',
                             children: (
-                                <Form.Item name='vin' noStyle>
-                                    <div className='flex flex-col items-start gap-0.5'>
-                                        <label htmlFor='vin' className={fieldLabelClassName}>Vehicle VIN</label>
+                                <div className='flex flex-col items-start gap-0.5'>
+                                    <label htmlFor='vin' className={fieldLabelClassName}>Vehicle VIN</label>
+                                    <Form.Item name='vin' noStyle>
                                         <Input
                                             id='vin'
                                             allowClear
@@ -213,8 +214,8 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                                                     onClick={() => onFinish(form.getFieldsValue())}
                                                 />}
                                         />
-                                    </div>
-                                </Form.Item>
+                                    </Form.Item>
+                                </div>
                             ),
                         }]}
                     />

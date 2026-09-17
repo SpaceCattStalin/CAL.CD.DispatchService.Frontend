@@ -25,11 +25,13 @@ const renderStopFields = (stop: Stop, keyPrefix: string) => [
 ];
 
 const DetailPage = () => {
-    const { dispatchId } = useParams<{ dispatchId: string; }>();
-    return <DetailPageContent key={dispatchId} dispatchId={dispatchId} />;
+    const { dispatchId: localDispatchId } = useParams<{ dispatchId: string; }>();
+    const parsedDispatchId = localDispatchId ?? null;
+
+    return <DetailPageContent key={parsedDispatchId} dispatchId={parsedDispatchId} />;
 };
 
-const DetailPageContent = ({ dispatchId }: { dispatchId: string | undefined; }) => {
+const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
     const navigate = useNavigate();
     const [dispatch, setDispatch] = useState<LoadProps>();
     const [loading, setLoading] = useState(true);

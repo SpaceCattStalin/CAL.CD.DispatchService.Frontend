@@ -167,7 +167,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
 
             <FormSection sectionName='Pick-Up Location' fields={renderStopFields('pickupStop')} />
             <FormSection sectionName='Delivery Location' fields={renderStopFields('dropoffStop')} />
-            
+
             <div className='grid grid-cols-3 gap-2'>
                 <div className='col-span-1'>
 
@@ -250,13 +250,13 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                                     children: (
                                                         <div className='flex flex-col gap-2 pb-5'>
                                                             <Form.Item name={[field.name, 'vehicleId']} hidden>
-                                                                <Input />
+                                                                <Input suffix={<></>} />
                                                             </Form.Item>
                                                             <div className='grid grid-cols-2 gap-3'>
                                                                 <div className='flex flex-col items-start gap-0.5 w-full'>
                                                                     <label className={fieldLabelClassName}>VIN</label>
                                                                     <Form.Item name={[field.name, 'vin']} noStyle>
-                                                                        <Input classNames={inputClassNames} size='small' placeholder='VIN' />
+                                                                        <Input classNames={inputClassNames} size='small' placeholder='VIN' suffix={<></>} />
                                                                     </Form.Item>
                                                                 </div>
                                                                 <div className='flex flex-col items-start gap-0.5 w-full'>
@@ -270,20 +270,20 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                                                 <div className='flex flex-col items-start gap-0.5 w-full'>
                                                                     <label className={fieldLabelClassName}>Make</label>
                                                                     <Form.Item name={[field.name, 'make']} rules={[{ required: true, message: 'Make is required' }]} noStyle>
-                                                                        <Input classNames={inputClassNames} size='small' placeholder='Make' />
+                                                                        <Input classNames={inputClassNames} size='small' placeholder='Make' suffix={<></>} />
                                                                     </Form.Item>
                                                                 </div>
                                                                 <div className='flex flex-col items-start gap-0.5 w-full'>
                                                                     <label className={fieldLabelClassName}>Model</label>
                                                                     <Form.Item name={[field.name, 'model']} rules={[{ required: true, message: 'Model is required' }]} noStyle>
-                                                                        <Input classNames={inputClassNames} size='small' placeholder='Model' />
+                                                                        <Input classNames={inputClassNames} size='small' placeholder='Model' suffix={<></>} />
                                                                     </Form.Item>
                                                                 </div>
                                                             </div>
                                                             <div className='flex flex-col items-start gap-0.5 w-full'>
                                                                 <label className={fieldLabelClassName}>Color</label>
                                                                 <Form.Item name={[field.name, 'color']} noStyle>
-                                                                    <Input classNames={inputClassNames} size='small' placeholder='Color' />
+                                                                    <Input classNames={inputClassNames} size='small' placeholder='Color' suffix={<></>} />
                                                                 </Form.Item>
                                                             </div>
                                                         </div>
@@ -294,8 +294,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                                 type='dashed'
                                                 icon={<PlusOutlined />}
                                                 className='w-fit'
-                                                /// ============================================== Generate vehicle id here ========================================
-                                                onClick={() => add({ vehicleId: crypto.randomUUID(), vin: undefined, year: undefined, make: '', model: '', color: undefined })}
+                                                onClick={() => add({ vehicleId: crypto.randomUUID(), vin: null, year: null, make: '', model: '', color: null })}
                                             >
                                                 Add Vehicle
                                             </Button>
@@ -313,7 +312,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
 
             <div className='flex justify-end gap-2'>
                 <Button onClick={() => navigate('/')}>Cancel</Button>
-                <Button type='primary' htmlType='submit' loading={submitting} onClick={() => console.log("Hello")}>
+                <Button type='primary' htmlType='submit' loading={submitting}>
                     {mode === 'create' ? 'Create Dispatch' : 'Save Changes'}
                 </Button>
             </div>

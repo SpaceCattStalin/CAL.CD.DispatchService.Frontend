@@ -85,18 +85,22 @@ export const buildDispatchSearchRequest = (
     filters: DispatchSearchFilters,
     currentPage = 1,
     pageSize = 10,
-): DispatchSearchRequestModel => ({
-    priceTotalMin: filters.priceMin ?? null,
-    priceTotalMax: filters.priceMax ?? null,
-    pickupDateFrom: filters.pickupDateRange?.[0].toISOString() ?? null,
-    pickupDateTo: filters.pickupDateRange?.[1].toISOString() ?? null,
-    dropoffDateFrom: filters.dropoffDateRange?.[0].toISOString() ?? null,
-    dropoffDateTo: filters.dropoffDateRange?.[1].toISOString() ?? null,
-    dispatchStatus: filters.status?.map((status) => status) ?? null,
-    vehicleVin: filters.vin ?? null,
-    size: pageSize,
-    currentPage
-});
+): DispatchSearchRequestModel => {
+    console.log('priceMin', typeof filters.priceMin, filters.priceMin);
+
+    return {
+        priceTotalMin: filters.priceMin ?? null,
+        priceTotalMax: filters.priceMax ?? null,
+        pickupDateFrom: filters.pickupDateRange?.[0].toISOString() ?? null,
+        pickupDateTo: filters.pickupDateRange?.[1].toISOString() ?? null,
+        dropoffDateFrom: filters.dropoffDateRange?.[0].toISOString() ?? null,
+        dropoffDateTo: filters.dropoffDateRange?.[1].toISOString() ?? null,
+        dispatchStatus: filters.status?.map((status) => status) ?? null,
+        vehicleVin: filters.vin ?? null,
+        size: pageSize,
+        currentPage
+    };
+};
 
 export const getDispatchBatch = async (request: DispatchSearchRequestModel): Promise<DispatchBatchResult> => {
     const response = await axiosInstance.post<getDispatchBatchResponse>("/dispatch/search", { ...request });
@@ -107,7 +111,7 @@ export const getDispatchBatch = async (request: DispatchSearchRequestModel): Pro
     };
 };
 
-export const getSingleDispatch = async (dispatchId: string | undefined): Promise<LoadProps> => {
+export const getSingleDispatch = async (dispatchId: string | null): Promise<LoadProps> => {
     const response = await axiosInstance.get<getDispatchResponse>(`/dispatch/${dispatchId}`);
 
     return toLoadProps(response.data);
@@ -115,10 +119,10 @@ export const getSingleDispatch = async (dispatchId: string | undefined): Promise
 
 const toStop = (stop: StopResponse | null): Stop => ({
     address: stop?.address ?? '',
-    locationName: stop?.locationName ?? undefined,
-    contactName: stop?.contactName ?? undefined,
-    contactPhone: stop?.contactPhone ?? undefined,
-    contactEmail: stop?.contactEmail ?? undefined,
+    locationName: stop?.locationName ?? '',
+    contactName: stop?.contactName ?? '',
+    contactPhone: stop?.contactPhone ?? '',
+    contactEmail: stop?.contactEmail ?? '',
 });
 
 const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
@@ -135,7 +139,7 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
         dropoffLocation: dropoffStop.address,
         dropoffStop,
         dropoffDate: new Date(dispatch.dropoffDate),
-        description: dispatch.description ?? undefined,
+        description: dispatch.description ?? '',
 
         carrierInfo: {
             carrierCompanyName: dispatch.carrierCompanyName,
@@ -227,15 +231,15 @@ export const toCreateDispatchRequest = (values: DispatchFormValues): CreateDispa
     price: values.price,
     pickupDate: values.pickupDate.toISOString(),
     dropoffDate: values.dropoffDate.toISOString(),
-    description: values.description || undefined,
+    description: values.description || '',
     pickupStop: values.pickupStop,
     dropoffStop: values.dropoffStop,
     vehicles: values.vehicles.map((vehicle) => ({
-        vin: vehicle.vin || undefined,
+        vin: vehicle.vin || '',
         year: vehicle.year!,
         make: vehicle.make,
         model: vehicle.model,
-        color: vehicle.color || undefined,
+        color: vehicle.color || '',
     })),
 });
 
@@ -243,16 +247,16 @@ export const toUpdateDispatchRequest = (values: DispatchFormValues): UpdateDispa
     price: values.price,
     pickupDate: values.pickupDate.toISOString(),
     dropoffDate: values.dropoffDate.toISOString(),
-    description: values.description || undefined,
+    description: values.description || '',
     pickupStop: values.pickupStop,
     dropoffStop: values.dropoffStop,
     vehicles: values.vehicles.map((vehicle) => ({
         vehicleId: vehicle.vehicleId,
-        vin: vehicle.vin || undefined,
+        vin: vehicle.vin || '',
         year: vehicle.year,
         make: vehicle.make,
         model: vehicle.model,
-        color: vehicle.color || undefined,
+        color: vehicle.color || '',
     })),
 });
 
