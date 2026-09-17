@@ -8,11 +8,13 @@ import { getSingleDispatch, updateDispatch, toUpdateDispatchRequest, toDispatchF
 import { LeftOutlined } from '@ant-design/icons';
 
 const UpdateDispatchPage = () => {
-    const { dispatchId } = useParams<{ dispatchId: string; }>();
-    return <UpdateDispatchPageContent key={dispatchId} dispatchId={dispatchId} />;
+    const { dispatchId : localDispatchId } = useParams<{ dispatchId: string; }>();
+    const parsedDispatchId = localDispatchId ?? null;
+    
+    return <UpdateDispatchPageContent key={parsedDispatchId} dispatchId={parsedDispatchId} />;
 };
 
-const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | undefined; }) => {
+const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
     const navigate = useNavigate();
     const [dispatch, setDispatch] = useState<LoadProps>();
     const [loading, setLoading] = useState(true);

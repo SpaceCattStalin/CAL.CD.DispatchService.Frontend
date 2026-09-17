@@ -11,7 +11,7 @@ import { debounce, debounceSeek } from '../utils/debounce';
 const LoadPage = () => {
   const [form] = Form.useForm<DispatchSearchFilters>();
   const [visibleDispatches, setVisibleDispatches] = useState<LoadProps[]>([]);
-  const [seekedDispatch, setSeekedDispatch] = useState<LoadProps>();
+  const [seekedDispatch, setSeekedDispatch] = useState<LoadProps | null>();
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -31,10 +31,32 @@ const LoadPage = () => {
       });
   };
 
+  const runSeek = (value: string | null) => {
+    setLoading(true);
+
+    return getSingleDispatch(value)
+      .then((data) => setSeekedDispatch(data))
+      .catch(() =>
+        setVisibleDispatches([])
+      )
+      .finally(() => setLoading(false));
+  };
+
   useEffect(() => {
     let cancelled = false;
 
-    getDispatchBatch(buildDispatchSearchRequest({}, 1, pageSize))
+    getDispatchBatch(buildDispatchSearchRequest(
+      {
+        dispatchId: null,
+        dropoffDateRange: null,
+        pickupDateRange: null,
+        priceMax: null,
+        priceMin: null,
+        status: null,
+        vin: null
+      },
+      1,
+      pageSize))
       .then(({ items, total }) => {
         if (cancelled) return;
         setVisibleDispatches(items);
@@ -55,12 +77,8 @@ const LoadPage = () => {
   );
 
   const debouncedSeek = useMemo(
-    () => debounceSeek((value: string | undefined) => {
-      setLoading(true);
-
-      getSingleDispatch(value)
-        .then((data) => setSeekedDispatch(data))
-        .finally(() => setLoading(false));
+    () => debounceSeek((value: string | null) => {
+      runSeek(value);
     }, 1000),
     []
   );
@@ -70,10 +88,9 @@ const LoadPage = () => {
     debouncedSearch(values, pageSize);
   };
 
-  const handleDispatchIdChange = (value: string | undefined) => {
+  const handleDispatchIdChange = (value: string | null) => {
     if (!value) {
-      setSeekedDispatch(undefined);
-      return;
+      setSeekedDispatch(null);
     }
     debouncedSeek(value);
   };
@@ -88,8 +105,17 @@ const LoadPage = () => {
 
   const handleReset = () => {
     form.resetFields();
+    
     setCurrentPage(1);
-    runSearch(buildDispatchSearchRequest({}, 1, pageSize));
+    runSearch(buildDispatchSearchRequest({
+      dispatchId: null,
+      dropoffDateRange: null,
+      pickupDateRange: null,
+      priceMax: null,
+      priceMin: null,
+      status: null,
+      vin: null
+    }, 1, pageSize));
   };
 
   return (
@@ -111,7 +137,7 @@ const LoadPage = () => {
         ) : (
           <div className='flex flex-col gap-3'>
             <div className='flex justify-between'>
-              <h1 className='text-[24px] text-[rgb(0,91,168)]'>{pageSize >= total ? total : pageSize} of {total} Dispatches</h1>
+              <h1 className='text-[24px] text-[rgb(0,91,168)]'>{visibleDispatches.length >= total ? total : visibleDispatches.length} of {total} Dispatches</h1>
               <Select
                 value={pageSize}
                 onChange={(size) => handlePageChange(currentPage, size)}
@@ -137,7 +163,7 @@ const LoadPage = () => {
           </div>
         )}
       </Content>
-    </Layout >
+    </Layout>
   );
 };
 

@@ -72,7 +72,7 @@ const secondaryButtonClassNames = createStaticStyles(({ css }) => ({
 
 const Load = ({ load }: { load: LoadProps; }) => {
     const navigate = useNavigate();
-    console.log(load);
+
     return (
         <div className='rounded-sm flex flex-col border border-gray-500'>
             <div>
@@ -173,7 +173,7 @@ const Load = ({ load }: { load: LoadProps; }) => {
                     >
                         Edit
                     </Button>
-                    <Button type='primary' classNames={buttonClassNames}>Assign</Button>
+                    {/* <Button type='primary' classNames={buttonClassNames}>Assign</Button> */}
                 </div>
             </div>
         </div>

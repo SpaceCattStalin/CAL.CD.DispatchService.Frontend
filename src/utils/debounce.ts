@@ -10,10 +10,10 @@ export const debounce = (func: (values: DispatchSearchFilters, size: number) => 
     };
 };
 
-export const debounceSeek = (func: (values: string | undefined) => void, delay: number) => {
+export const debounceSeek = (func: (values: string | null) => void, delay: number) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    return (values: string | undefined) => {
+    return (values: string | null) => {
         if (timeoutId) clearTimeout(timeoutId);
 
         timeoutId = setTimeout(() => func(values), delay);

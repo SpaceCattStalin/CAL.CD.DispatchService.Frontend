@@ -3,11 +3,12 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import DispatchListingPage from './pages/DispatchListingPage.tsx';
+//import DispatchListingPage from './pages/DispatchListingPage.tsx';
 import CreateDispatchPage from './pages/CreateDispatchPage.tsx';
 import UpdateDispatchPage from './pages/UpdateDispatchPage.tsx';
 import LoadPage from './pages/LoadPage.tsx';
 import DetailPage from './pages/DetailPage.tsx';
+import LoginPage from './pages/LoginPage.tsx';
 
 
 const router = createBrowserRouter([
@@ -19,6 +20,15 @@ const router = createBrowserRouter([
       { path: 'create', element: <CreateDispatchPage /> },
       { path: 'dispatch/:dispatchId', element: <DetailPage /> },
       { path: 'dispatch/:dispatchId/edit', element: <UpdateDispatchPage /> }
+    ]
+  },
+  {
+    path: 'account',
+    children: [
+      {
+        path: 'login',
+        element: <LoginPage />
+      }
     ]
   }
 ]);
