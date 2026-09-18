@@ -3,6 +3,7 @@ import Load from '../components/Load/Load';
 import type { LoadProps } from '../components/Load/Load';
 import { Layout, Form, Spin, Empty, Pagination, Select } from 'antd';
 import SearchFilters, { type DispatchSearchFilters } from '../components/common/SearchFilters';
+import SortControl, { type SortValue } from '../components/common/SortControl';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
 import { getDispatchBatch, buildDispatchSearchRequest, getSingleDispatch } from '../services/dispatchService';
@@ -16,6 +17,7 @@ const LoadPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const [sortValue, setSortValue] = useState<SortValue>({ field: 'createdAt', direction: 'desc' });
 
 
   const runSearch = (request: ReturnType<typeof buildDispatchSearchRequest>) => {
@@ -56,7 +58,8 @@ const LoadPage = () => {
         vin: null
       },
       1,
-      pageSize))
+      pageSize,
+      sortValue))
       .then(({ items, total }) => {
         if (cancelled) return;
         setVisibleDispatches(items);
@@ -70,8 +73,8 @@ const LoadPage = () => {
   }, []);
 
   const debouncedSearch = useMemo(
-    () => debounce((values: DispatchSearchFilters, size: number) => {
-      runSearch(buildDispatchSearchRequest(values, 1, size));
+    () => debounce((values: DispatchSearchFilters, size: number, sort: SortValue) => {
+      runSearch(buildDispatchSearchRequest(values, 1, size, sort));
     }, 1000),
     []
   );
@@ -85,7 +88,7 @@ const LoadPage = () => {
 
   const handleSearch = (values: DispatchSearchFilters) => {
     setCurrentPage(1);
-    debouncedSearch(values, pageSize);
+    debouncedSearch(values, pageSize, sortValue);
   };
 
   const handleDispatchIdChange = (value: string | null) => {
@@ -99,13 +102,13 @@ const LoadPage = () => {
     const nextPage = size !== pageSize ? 1 : page;
     setCurrentPage(nextPage);
     setPageSize(size);
-    runSearch(buildDispatchSearchRequest(form.getFieldsValue(), nextPage, size));
+    runSearch(buildDispatchSearchRequest(form.getFieldsValue(), nextPage, size, sortValue));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleReset = () => {
     form.resetFields();
-    
+
     setCurrentPage(1);
     runSearch(buildDispatchSearchRequest({
       dispatchId: null,
@@ -115,7 +118,20 @@ const LoadPage = () => {
       priceMin: null,
       status: null,
       vin: null
-    }, 1, pageSize));
+    }, 1, pageSize, sortValue));
+  };
+
+  const debouncedSortSearch = useMemo(
+    () => debounce((values: DispatchSearchFilters, size: number, sort: SortValue) => {
+      runSearch(buildDispatchSearchRequest(values, 1, size, sort));
+    }, 1000),
+    []
+  );
+
+  const handleSortChange = (nextSort: SortValue) => {
+    setSortValue(nextSort);
+    setCurrentPage(1);
+    debouncedSortSearch(form.getFieldsValue(), pageSize, nextSort);
   };
 
   return (
@@ -136,8 +152,10 @@ const LoadPage = () => {
           <Load load={seekedDispatch} />
         ) : (
           <div className='flex flex-col gap-3'>
+            <h1 className='text-[24px] text-[rgb(0,91,168)]'>{visibleDispatches.length >= total ? total : visibleDispatches.length} of {total} Dispatches</h1>
+
             <div className='flex justify-between'>
-              <h1 className='text-[24px] text-[rgb(0,91,168)]'>{visibleDispatches.length >= total ? total : visibleDispatches.length} of {total} Dispatches</h1>
+              <SortControl value={sortValue} onChange={handleSortChange} />
               <Select
                 value={pageSize}
                 onChange={(size) => handlePageChange(currentPage, size)}

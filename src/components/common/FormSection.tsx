@@ -6,16 +6,12 @@ export type FormSectionFieldName = string | number | (string | number)[];
 export type FormSectionField = {
     key: string;
     label: string;
-    // form field path matching the Form.Item's `name`, used to display its validation error.
-    // omit for fields with no Form.Item (e.g. read-only displays).
     name?: FormSectionFieldName;
-    input: ReactNode; // already wrapped in <Form.Item name=... noStyle> by the caller
+    input: ReactNode; 
 };
 
 export type FormSectionProps = {
     sectionName: string;
-    // Each entry is one row. A single field renders full-width;
-    // an array of fields renders them side-by-side in that row (e.g. pickup/dropoff dates).
     fields: (FormSectionField | FormSectionField[])[];
     className?: string;
 };
@@ -23,8 +19,6 @@ export type FormSectionProps = {
 const fieldLabelClassName = 'text-[12px] text-[rgb(109,109,109)]';
 const fieldErrorClassName = 'text-[11px] text-red-500';
 
-// noStyle Form.Items don't render their own error text, so this reads the field's
-// current errors from form state and renders them wherever it's placed.
 export const FieldError = ({ name }: { name: FormSectionFieldName }) => {
     const form = Form.useFormInstance();
     return (

@@ -10,6 +10,9 @@ import LoadPage from './pages/LoadPage.tsx';
 import DetailPage from './pages/DetailPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 const router = createBrowserRouter([
   {

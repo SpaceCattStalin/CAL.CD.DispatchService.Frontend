@@ -12,6 +12,24 @@ const CreateDispatchPage = () => {
     const handleFinish = async (values: DispatchFormValues) => {
         setSubmitting(true);
         try {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            // Add 1 second to account for the time the request get to the server
+            // Maybe bug badly in production
+            const seconds = now.getSeconds() + 1;
+            values = {
+                ...values,
+                pickupDate: values["pickupDate"]
+                    .add(hours, "hour")
+                    .add(minutes, "minute")
+                    .add(seconds, "second"),
+                dropoffDate: values["dropoffDate"]
+                    .add(hours, "hour")
+                    .add(minutes, "minute")
+                    .add(seconds, "second")
+            };
+
             const { location } = await createDispatch(toCreateDispatchRequest(values));
             navigate(location);
         } catch {

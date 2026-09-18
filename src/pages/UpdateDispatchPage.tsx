@@ -8,9 +8,9 @@ import { getSingleDispatch, updateDispatch, toUpdateDispatchRequest, toDispatchF
 import { LeftOutlined } from '@ant-design/icons';
 
 const UpdateDispatchPage = () => {
-    const { dispatchId : localDispatchId } = useParams<{ dispatchId: string; }>();
+    const { dispatchId: localDispatchId } = useParams<{ dispatchId: string; }>();
     const parsedDispatchId = localDispatchId ?? null;
-    
+
     return <UpdateDispatchPageContent key={parsedDispatchId} dispatchId={parsedDispatchId} />;
 };
 
@@ -39,6 +39,25 @@ const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | null; 
     const handleFinish = async (values: DispatchFormValues) => {
         setSubmitting(true);
         try {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            // Add 1 second to account for the time the request get to the server
+            // Maybe bug badly in production
+            const seconds = now.getSeconds() + 1;
+            values = {
+                ...values,
+                pickupDate: values["pickupDate"]
+                    .add(hours, "hour")
+                    .add(minutes, "minute")
+                    .add(seconds, "second"),
+                dropoffDate: values["dropoffDate"]
+                    .add(hours, "hour")
+                    .add(minutes, "minute")
+                    .add(seconds, "second")
+            };
+
+
             const { location } = await updateDispatch(dispatch.dispatchId, toUpdateDispatchRequest(values));
             navigate(location);
         } catch {

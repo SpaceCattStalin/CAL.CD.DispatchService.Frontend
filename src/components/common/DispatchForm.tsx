@@ -134,7 +134,7 @@ const renderStopFields = (stopName: 'pickupStop' | 'dropoffStop') => [
                             min: 15, max: 30, message: 'Email must between 15 and 30 characters long'
                         },
                         {
-                            pattern: /^\w+@\w+$/,
+                            pattern: /^[\w.+-]+@[\w-]+(\.[\w-]+)*\.[a-zA-Z]{2,}$/,
                             message: 'Valid email address need to have @'
                         }
                     ]}
@@ -243,7 +243,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                         name='price'
                                         rules={[
                                             { required: true, message: 'Price is required' },
-                                            { min: 0, message: "Price must be greater than 0" }
+                                            { type: 'number', min: 0, message: 'Price must be greater than 0' }
                                         ]}
                                         noStyle
                                     >
@@ -321,7 +321,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                 name='vehicles'
                                 rules={[{
                                     validator: (_, value) =>
-                                        value.length > 1 && value.length < 12
+                                        (value?.length ?? 0) >= 1 && (value?.length ?? 0) <= 12
                                             ?
                                             Promise.resolve()
                                             :
@@ -347,74 +347,74 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                                     const vehicleAction = initialVehicleIdsRef.current.has(vehicleId) ? 'updating' : 'adding';
 
                                                     return {
-                                                    key: String(field.key),
-                                                    label: `Vehicle ${index + 1}`,
-                                                    extra: (
-                                                        <DeleteOutlined
-                                                            style={{ color: '#005ba8' }}
-                                                            onClick={(event) => {
-                                                                event.stopPropagation();
-                                                                remove(field.name);
-                                                            }}
-                                                        />
-                                                    ),
-                                                    children: (
-                                                        <div className='flex flex-col gap-2 pb-5'>
-                                                            <Form.Item name={[field.name, 'vehicleId']} hidden>
-                                                                <Input suffix={<></>} />
-                                                            </Form.Item>
-                                                            <div className='grid grid-cols-2 gap-3'>
-                                                                <div className='flex flex-col items-start gap-0.5 w-full'>
-                                                                    <label className={fieldLabelClassName}>VIN</label>
-                                                                    <Form.Item
-                                                                        name={[field.name, 'vin']}
-                                                                        rules={[{ min: 10, max: 15, message: 'Vin must be 10 to 15 character length' }]}
-                                                                        noStyle
-                                                                    >
-                                                                        <Input classNames={inputClassNames} size='small' placeholder='VIN' suffix={<></>} />
-                                                                    </Form.Item>
-                                                                    <FieldError name={['vehicles', field.name, 'vin']} />
-                                                                </div>
-                                                                <div className='flex flex-col items-start gap-0.5 w-full'>
-                                                                    <label className={fieldLabelClassName}>Year</label>
-                                                                    <Form.Item
-                                                                        name={[field.name, 'year']}
-                                                                        rules={[
-                                                                            { required: true, message: `Year is required when ${vehicleAction} a new vehicle.` },
-                                                                            { type: 'number', min: 1900, max: CURRENT_YEAR, message: 'Year must be between 1900 and next year' }
-                                                                        ]}
-                                                                        noStyle
-                                                                    >
-                                                                        <Select classNames={selectClassNames} size='small' showSearch={{ optionFilterProp: 'label' }} options={VEHICLE_YEAR_OPTIONS} placeholder='Year' />
-                                                                    </Form.Item>
-                                                                    <FieldError name={['vehicles', field.name, 'year']} />
-                                                                </div>
-                                                            </div>
-                                                            <div className='grid grid-cols-2 gap-3'>
-                                                                <div className='flex flex-col items-start gap-0.5 w-full'>
-                                                                    <label className={fieldLabelClassName}>Make</label>
-                                                                    <Form.Item name={[field.name, 'make']} rules={[{ required: true, message: `Make is required when ${vehicleAction} a new vehicle.` }]} noStyle>
-                                                                        <Input classNames={inputClassNames} size='small' placeholder='Make' suffix={<></>} />
-                                                                    </Form.Item>
-                                                                    <FieldError name={['vehicles', field.name, 'make']} />
-                                                                </div>
-                                                                <div className='flex flex-col items-start gap-0.5 w-full'>
-                                                                    <label className={fieldLabelClassName}>Model</label>
-                                                                    <Form.Item name={[field.name, 'model']} rules={[{ required: true, message: `Model is required when ${vehicleAction} a new vehicle.` }]} noStyle>
-                                                                        <Input classNames={inputClassNames} size='small' placeholder='Model' suffix={<></>} />
-                                                                    </Form.Item>
-                                                                    <FieldError name={['vehicles', field.name, 'model']} />
-                                                                </div>
-                                                            </div>
-                                                            <div className='flex flex-col items-start gap-0.5 w-full'>
-                                                                <label className={fieldLabelClassName}>Color</label>
-                                                                <Form.Item name={[field.name, 'color']} noStyle>
-                                                                    <Input classNames={inputClassNames} size='small' placeholder='Color' suffix={<></>} />
+                                                        key: String(field.key),
+                                                        label: `Vehicle ${index + 1}`,
+                                                        extra: (
+                                                            <DeleteOutlined
+                                                                style={{ color: '#005ba8' }}
+                                                                onClick={(event) => {
+                                                                    event.stopPropagation();
+                                                                    remove(field.name);
+                                                                }}
+                                                            />
+                                                        ),
+                                                        children: (
+                                                            <div className='flex flex-col gap-2 pb-5'>
+                                                                <Form.Item name={[field.name, 'vehicleId']} hidden>
+                                                                    <Input suffix={<></>} />
                                                                 </Form.Item>
+                                                                <div className='grid grid-cols-2 gap-3'>
+                                                                    <div className='flex flex-col items-start gap-0.5 w-full'>
+                                                                        <label className={fieldLabelClassName}>VIN</label>
+                                                                        <Form.Item
+                                                                            name={[field.name, 'vin']}
+                                                                            rules={[{ min: 10, max: 15, message: 'Vin must be 10 to 15 character length' }]}
+                                                                            noStyle
+                                                                        >
+                                                                            <Input classNames={inputClassNames} size='small' placeholder='VIN' suffix={<></>} />
+                                                                        </Form.Item>
+                                                                        <FieldError name={['vehicles', field.name, 'vin']} />
+                                                                    </div>
+                                                                    <div className='flex flex-col items-start gap-0.5 w-full'>
+                                                                        <label className={fieldLabelClassName}>Year</label>
+                                                                        <Form.Item
+                                                                            name={[field.name, 'year']}
+                                                                            rules={[
+                                                                                { required: true, message: `Year is required when ${vehicleAction} a new vehicle.` },
+                                                                                { type: 'number', min: 1900, max: CURRENT_YEAR, message: 'Year must be between 1900 and next year' }
+                                                                            ]}
+                                                                            noStyle
+                                                                        >
+                                                                            <Select classNames={selectClassNames} size='small' showSearch={{ optionFilterProp: 'label' }} options={VEHICLE_YEAR_OPTIONS} placeholder='Year' />
+                                                                        </Form.Item>
+                                                                        <FieldError name={['vehicles', field.name, 'year']} />
+                                                                    </div>
+                                                                </div>
+                                                                <div className='grid grid-cols-2 gap-3'>
+                                                                    <div className='flex flex-col items-start gap-0.5 w-full'>
+                                                                        <label className={fieldLabelClassName}>Make</label>
+                                                                        <Form.Item name={[field.name, 'make']} rules={[{ required: true, message: `Make is required when ${vehicleAction} a new vehicle.` }]} noStyle>
+                                                                            <Input classNames={inputClassNames} size='small' placeholder='Make' suffix={<></>} />
+                                                                        </Form.Item>
+                                                                        <FieldError name={['vehicles', field.name, 'make']} />
+                                                                    </div>
+                                                                    <div className='flex flex-col items-start gap-0.5 w-full'>
+                                                                        <label className={fieldLabelClassName}>Model</label>
+                                                                        <Form.Item name={[field.name, 'model']} rules={[{ required: true, message: `Model is required when ${vehicleAction} a new vehicle.` }]} noStyle>
+                                                                            <Input classNames={inputClassNames} size='small' placeholder='Model' suffix={<></>} />
+                                                                        </Form.Item>
+                                                                        <FieldError name={['vehicles', field.name, 'model']} />
+                                                                    </div>
+                                                                </div>
+                                                                <div className='flex flex-col items-start gap-0.5 w-full'>
+                                                                    <label className={fieldLabelClassName}>Color</label>
+                                                                    <Form.Item name={[field.name, 'color']} noStyle>
+                                                                        <Input classNames={inputClassNames} size='small' placeholder='Color' suffix={<></>} />
+                                                                    </Form.Item>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ),
-                                                };
+                                                        ),
+                                                    };
                                                 })}
                                             />
                                             <Button

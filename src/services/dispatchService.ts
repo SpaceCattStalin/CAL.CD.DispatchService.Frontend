@@ -3,6 +3,7 @@ import axiosInstance from "./axiosInstance";
 import type { DispatchStatus } from "../types/Dispatch";
 import type { LoadProps } from "../components/Load/Load";
 import type { DispatchSearchFilters } from "../components/common/SearchFilters";
+import type { SortValue, SortField } from "../components/common/SortControl";
 import type { DispatchFormValues } from "../components/common/DispatchForm";
 import type { Stop } from "../types/Stop";
 
@@ -67,6 +68,13 @@ export type DispatchBatchResult = {
     total: number;
 };
 
+type SortDirectionRequest = 'ASCENDING' | 'DESCENDING';
+
+type SortFieldRequest = {
+    name: string;
+    direction: SortDirectionRequest;
+};
+
 type DispatchSearchRequestModel = {
     priceTotalMin: number | null;
     priceTotalMax: number | null;
@@ -78,16 +86,21 @@ type DispatchSearchRequestModel = {
     vehicleVin: string | null;
     size: number | null;
     currentPage: number | null;
+    sortFields: SortFieldRequest[];
 };
 
+// Maps the frontend's sort field keys to the backend's sortable property names.
+const SORT_FIELD_NAME_MAP: Record<SortField, string> = {
+    createdAt: 'createdAt',
+    price: 'priceTotal',
+};
 
 export const buildDispatchSearchRequest = (
     filters: DispatchSearchFilters,
     currentPage = 1,
     pageSize = 10,
+    sort?: SortValue,
 ): DispatchSearchRequestModel => {
-    console.log('priceMin', typeof filters.priceMin, filters.priceMin);
-
     return {
         priceTotalMin: filters.priceMin ?? null,
         priceTotalMax: filters.priceMax ?? null,
@@ -98,7 +111,10 @@ export const buildDispatchSearchRequest = (
         dispatchStatus: filters.status?.map((status) => status) ?? null,
         vehicleVin: filters.vin ?? null,
         size: pageSize,
-        currentPage
+        currentPage,
+        sortFields: sort
+            ? [{ name: SORT_FIELD_NAME_MAP[sort.field], direction: sort.direction === 'asc' ? 'ASCENDING' : 'DESCENDING' }]
+            : [],
     };
 };
 
