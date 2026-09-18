@@ -1,8 +1,14 @@
 import type { ReactNode } from 'react';
+import { Form } from 'antd';
+
+export type FormSectionFieldName = string | number | (string | number)[];
 
 export type FormSectionField = {
     key: string;
     label: string;
+    // form field path matching the Form.Item's `name`, used to display its validation error.
+    // omit for fields with no Form.Item (e.g. read-only displays).
+    name?: FormSectionFieldName;
     input: ReactNode; // already wrapped in <Form.Item name=... noStyle> by the caller
 };
 
@@ -15,6 +21,21 @@ export type FormSectionProps = {
 };
 
 const fieldLabelClassName = 'text-[12px] text-[rgb(109,109,109)]';
+const fieldErrorClassName = 'text-[11px] text-red-500';
+
+// noStyle Form.Items don't render their own error text, so this reads the field's
+// current errors from form state and renders them wherever it's placed.
+export const FieldError = ({ name }: { name: FormSectionFieldName }) => {
+    const form = Form.useFormInstance();
+    return (
+        <Form.Item noStyle shouldUpdate>
+            {() => {
+                const errors = form.getFieldError(name);
+                return errors.length > 0 ? <span className={fieldErrorClassName}>{errors[0]}</span> : null;
+            }}
+        </Form.Item>
+    );
+};
 
 const FormSection = ({ sectionName, fields, className = '' }: FormSectionProps) => {
     return (
@@ -32,6 +53,7 @@ const FormSection = ({ sectionName, fields, className = '' }: FormSectionProps) 
                                 <div key={field.key} className='flex flex-col items-start gap-0.5 w-full'>
                                     <label className={fieldLabelClassName}>{field.label}</label>
                                     {field.input}
+                                    {field.name !== undefined && <FieldError name={field.name} />}
                                 </div>
                             ))}
                         </div>
