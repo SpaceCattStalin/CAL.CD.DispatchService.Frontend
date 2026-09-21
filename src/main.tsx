@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage.tsx';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { AuthProvider } from './contexts/AuthProvider.tsx';
 dayjs.extend(utc);
 
 const router = createBrowserRouter([
@@ -38,6 +39,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );

@@ -8,7 +8,7 @@ export const authReducer = (state: AuthState, action: PayloadAction<AuthState>) 
         case 'SIGN_OUT':
             localStorage.removeItem("identity");
             localStorage.removeItem("isAuthenticated");
-            return { isAuthenticated: false, isInitialized: true };
+            return { isAuthenticated: false };
         default:
             return state;
     }

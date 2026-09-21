@@ -1,5 +1,5 @@
 import { Button, Form, Input, message } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { inputClassNames } from '../components/common/inputStyles';
 import { createStaticStyles } from 'antd-style';
 import Password from 'antd/es/input/Password';
@@ -35,6 +35,9 @@ const LoginPage = () => {
     const [form] = Form.useForm<LoginFormValues>();
     const [submitting, setSubmitting] = useState<boolean>(false);
     const { dispatch } = useAuth();
+    useEffect(() => {
+        console.log("Hello");
+    }, []);
     const handleFinish = async (values: LoginFormValues) => {
         setSubmitting(true);
         try {
