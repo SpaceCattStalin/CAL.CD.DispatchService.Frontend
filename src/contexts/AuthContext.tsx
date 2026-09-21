@@ -18,6 +18,7 @@ export const initialState: AuthState = {
     payload: null
 };
 
+
 export const AuthContext = createContext<AuthContextType>({
     ...initialState,
     dispatch: () => null

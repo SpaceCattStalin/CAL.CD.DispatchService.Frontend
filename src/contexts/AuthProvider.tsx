@@ -1,8 +1,9 @@
-import { useEffect, useReducer } from 'react';
+import { useReducer } from 'react';
 import { authReducer } from './auth/authReducer';
 import { initialState, AuthContext } from './AuthContext';
 import { base64UrlDecode } from '../utils/decoder';
-import type { JwtPayload } from '../types/Auth';
+import type { AuthState, JwtPayload } from '../types/Auth';
+import type { LoginResponse } from '../services/identityService';
 
 // const base64UrlEncode = (str: string) => {
 //     return btoa(str)
@@ -18,6 +19,20 @@ import type { JwtPayload } from '../types/Auth';
 //     return <AuthContext value={{ ...authState, dispatch }}>{children}</AuthContext>;
 // }
 
+const createInitialState = (): AuthState => {
+    const rawIdentity = localStorage.getItem("identity");
+    const identity = rawIdentity ? JSON.parse(rawIdentity) as LoginResponse : null;
+
+    const payload = identity ? decodeJwtPayload(identity.accessToken) : null;
+
+
+    return {
+        isAuthenticated: identity ? true : false,
+        identity: identity,
+        payload: payload
+    };
+};
+
 const decodeJwtPayload = (token?: string): JwtPayload | null => {
     if (!token) return null;
     const payload = token.split(".")[1];
@@ -25,12 +40,9 @@ const decodeJwtPayload = (token?: string): JwtPayload | null => {
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode; }) {
-    const [authState, dispatch] = useReducer(authReducer, initialState);
+    const [authState, dispatch] = useReducer(authReducer, initialState, createInitialState);
 
     const payload = decodeJwtPayload(authState.identity?.accessToken);
-    useEffect(() => {
-        console.log("Hi");
-    }, []);
-    // console.log(decodeJwtPayload(authState.identity?.accessToken));
+
     return <AuthContext value={{ ...authState, dispatch, payload }}>{children}</AuthContext>;
 }
