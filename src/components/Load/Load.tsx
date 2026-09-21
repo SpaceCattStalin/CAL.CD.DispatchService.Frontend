@@ -6,6 +6,7 @@ import type { Stop } from '../../types/Stop';
 import StatusBadge from '../common/StatusBadge';
 import { Button } from 'antd';
 import { createStaticStyles } from 'antd-style';
+import { useAuth } from '../../contexts/AuthContext';
 
 export type LoadProps = {
     dispatchId: string,
@@ -14,6 +15,7 @@ export type LoadProps = {
     dispatchStatus: StatusBadgeProps['status'],
     pickupDate: Date,
     carrierInfo: Company,
+    shipperInfo: Company,
     driverInfo: Driver,
     dropoffLocation: string,
     dropoffStop: Stop,
@@ -26,9 +28,9 @@ export type LoadProps = {
 };
 
 export type Company = {
-    carrierCompanyName: string,
-    carrierCompanyPhone: string,
-    carrierCompanyEmail: string;
+    companyName: string,
+    companyPhone: string,
+    companyEmail: string;
 };
 
 type Driver = {
@@ -39,19 +41,19 @@ type Driver = {
 };
 
 
-const buttonClassNames = createStaticStyles(({ css }) => ({
-    root: css`
-            background-color: rgb(0, 91, 168);
+// const buttonClassNames = createStaticStyles(({ css }) => ({
+//     root: css`
+//             background-color: rgb(0, 91, 168);
 
-            :hover {
-                background-color: #2372B8 !important;
-                transition: all;
-            }
-        `,
-    content: css`
-            color:#fff;
-        `
-}));
+//             :hover {
+//                 background-color: #2372B8 !important;
+//                 transition: all;
+//             }
+//         `,
+//     content: css`
+//             color:#fff;
+//         `
+// }));
 
 const secondaryButtonClassNames = createStaticStyles(({ css }) => ({
     root: css`
@@ -72,7 +74,8 @@ const secondaryButtonClassNames = createStaticStyles(({ css }) => ({
 
 const Load = ({ load }: { load: LoadProps; }) => {
     const navigate = useNavigate();
-
+    const { payload } = useAuth();
+    console.log(payload?.company_type);
     return (
         <div className='rounded-sm flex flex-col border border-gray-500'>
             <div>
@@ -99,12 +102,18 @@ const Load = ({ load }: { load: LoadProps; }) => {
                         <div className='text-[12px] text-[rgb(109,109,109)]'>Dispatch Date</div>
                         <div className='text-[18px] text-black'>{load.pickupDate.toLocaleDateString()}</div>
                     </div>
-                    <div className='flex flex-col'>
+                    {payload?.company_type === 'Shipper' && <div className='flex flex-col'>
                         <div className='text-[12px] text-[rgb(109,109,109)]'>Carrier Info</div>
-                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.carrierInfo.carrierCompanyName}</span>
-                        <span className='text-[14px] text-black'>{load.carrierInfo.carrierCompanyEmail}</span>
-                        <span className='text-[14px] text-black'>{load.carrierInfo.carrierCompanyPhone}</span>
-                    </div>
+                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.carrierInfo.companyName}</span>
+                        <span className='text-[14px] text-black'>{load.carrierInfo.companyEmail}</span>
+                        <span className='text-[14px] text-black'>{load.carrierInfo.companyPhone}</span>
+                    </div>}
+                    {payload?.company_type === 'Carrier' && <div className='flex flex-col'>
+                        <div className='text-[12px] text-[rgb(109,109,109)]'>Shipper Info</div>
+                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.shipperInfo.companyName}</span>
+                        <span className='text-[14px] text-black'>{load.shipperInfo.companyEmail}</span>
+                        <span className='text-[14px] text-black'>{load.shipperInfo.companyPhone}</span>
+                    </div>}
                 </div>
                 <div className='flex flex-col'>
                     <div className='text-[#003468] font-bold'>

@@ -200,9 +200,9 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                             },
                         ]
                         : [
-                            { key: 'companyName', label: 'Company Name', input: <Input readOnly value={carrierInfo?.carrierCompanyName} styles={readOnlyStyles} classNames={readOnlyClassNames} size='small' /> },
-                            { key: 'companyPhone', label: 'Phone', input: <Input readOnly value={carrierInfo?.carrierCompanyPhone} styles={readOnlyStyles} classNames={readOnlyClassNames} size='small' /> },
-                            { key: 'companyEmail', label: 'Email', input: <Input readOnly value={carrierInfo?.carrierCompanyEmail} styles={readOnlyStyles} classNames={readOnlyClassNames} size='small' /> },
+                            { key: 'companyName', label: 'Company Name', input: <Input readOnly value={carrierInfo?.companyName} styles={readOnlyStyles} classNames={readOnlyClassNames} size='small' /> },
+                            { key: 'companyPhone', label: 'Phone', input: <Input readOnly value={carrierInfo?.companyPhone} styles={readOnlyStyles} classNames={readOnlyClassNames} size='small' /> },
+                            { key: 'companyEmail', label: 'Email', input: <Input readOnly value={carrierInfo?.companyEmail} styles={readOnlyStyles} classNames={readOnlyClassNames} size='small' /> },
                         ]
                 }
             />

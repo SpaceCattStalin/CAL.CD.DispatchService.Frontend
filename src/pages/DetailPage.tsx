@@ -71,22 +71,30 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
                 <FormSection
                     sectionName='Carrier'
                     fields={[
-                        { key: 'companyName', label: 'Company Name', input: <Input readOnly value={dispatch.carrierInfo.carrierCompanyName} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={companyNameInputClassNames} size='small' /> },
-                        { key: 'companyPhone', label: 'Phone', input: <Input readOnly value={dispatch.carrierInfo.carrierCompanyPhone} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
-                        { key: 'companyEmail', label: 'Email', input: <Input readOnly value={dispatch.carrierInfo.carrierCompanyEmail} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
+                        { key: 'companyName', label: 'Company Name', input: <Input readOnly value={dispatch.carrierInfo.companyName} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={companyNameInputClassNames} size='small' /> },
+                        { key: 'companyPhone', label: 'Phone', input: <Input readOnly value={dispatch.carrierInfo.companyPhone} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
+                        { key: 'companyEmail', label: 'Email', input: <Input readOnly value={dispatch.carrierInfo.companyEmail} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
                     ]}
                 />
                 <FormSection
-                    sectionName='Pick Up and Delivery Date'
+                    sectionName='Shipper'
                     fields={[
-                        [
-                            { key: 'pickupDate', label: 'Pickup Date', input: <Input readOnly styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} value={dispatch.pickupDate.toLocaleDateString()} classNames={valueInputClassNames} size='small' /> },
-                            { key: 'dropoffDate', label: 'Dropoff Date', input: <Input readOnly styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} value={dispatch.dropoffDate.toLocaleDateString()} classNames={valueInputClassNames} size='small' /> },
-                        ],
+                        { key: 'shipperCompanyName', label: 'Company Name', input: <Input readOnly value={dispatch.shipperInfo.companyName} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={companyNameInputClassNames} size='small' /> },
+                        { key: 'shipperCompanyPhone', label: 'Phone', input: <Input readOnly value={dispatch.shipperInfo.companyPhone} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
+                        { key: 'shipperCompanyEmail', label: 'Email', input: <Input readOnly value={dispatch.shipperInfo.companyEmail} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
                     ]}
                 />
             </div>
 
+            <FormSection
+                sectionName='Pick Up and Delivery Date'
+                fields={[
+                    [
+                        { key: 'pickupDate', label: 'Pickup Date', input: <Input readOnly styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} value={dispatch.pickupDate.toLocaleDateString()} classNames={valueInputClassNames} size='small' /> },
+                        { key: 'dropoffDate', label: 'Dropoff Date', input: <Input readOnly styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} value={dispatch.dropoffDate.toLocaleDateString()} classNames={valueInputClassNames} size='small' /> },
+                    ],
+                ]}
+            />
 
             <div className='grid grid-cols-2 gap-3'>
                 <FormSection sectionName='Pick-Up Location' fields={renderStopFields(dispatch.pickupStop, 'pickup')} />

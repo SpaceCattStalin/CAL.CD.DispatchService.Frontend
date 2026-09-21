@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import axiosInstance from "./axiosInstance";
 import type { DispatchStatus } from "../types/Dispatch";
-import type { LoadProps } from "../components/Load/Load";
+import type { LoadProps, Company } from "../components/Load/Load";
 import type { DispatchSearchFilters } from "../components/common/SearchFilters";
 import type { SortValue, SortField } from "../components/common/SortControl";
 import type { DispatchFormValues } from "../components/common/DispatchForm";
@@ -37,10 +37,17 @@ type DriverResponse = {
     email: string;
 };
 
+type CompanyResponse = {
+    companyId: string;
+    companyName: string;
+    companyPhone: string;
+    companyEmail: string;
+};
+
 type getDispatchResponse = {
     dispatchId: string;
-    shipperId: string;
-    carrierId: string;
+    shipper: CompanyResponse | null;
+    carrier: CompanyResponse | null;
     dispatchStatus: DispatchStatus;
     price: number;
     pickupDate: string;
@@ -52,9 +59,6 @@ type getDispatchResponse = {
     vehicles: VehicleResponse[] | null;
     drivers: DriverResponse[] | null;
     createdAt: string;
-    carrierCompanyName: string;
-    carrierCompanyPhone: string;
-    carrierCompanyEmail: string;
 };
 
 type getDispatchBatchResponse = {
@@ -141,6 +145,12 @@ const toStop = (stop: StopResponse | null): Stop => ({
     contactEmail: stop?.contactEmail ?? '',
 });
 
+const toCompany = (company: CompanyResponse | null): Company => ({
+    companyName: company?.companyName ?? '',
+    companyPhone: company?.companyPhone ?? '',
+    companyEmail: company?.companyEmail ?? '',
+});
+
 const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
     const [firstDriver] = dispatch.drivers ?? [];
     const pickupStop = toStop(dispatch.pickupStop);
@@ -157,11 +167,8 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
         dropoffDate: new Date(dispatch.dropoffDate),
         description: dispatch.description ?? '',
 
-        carrierInfo: {
-            carrierCompanyName: dispatch.carrierCompanyName,
-            carrierCompanyPhone: dispatch.carrierCompanyPhone,
-            carrierCompanyEmail: dispatch.carrierCompanyEmail
-        },
+        carrierInfo: toCompany(dispatch.carrier),
+        shipperInfo: toCompany(dispatch.shipper),
 
         driverInfo: firstDriver
             ? {
