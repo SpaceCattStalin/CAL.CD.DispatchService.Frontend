@@ -30,6 +30,7 @@ const ProfileMenu = ({ payload, onLogout }: ProfileMenuProps) => {
                     <span className='text-[#6a7282]'>Company Type</span>
                     <span className='font-medium'>{payload.company_type}</span>
                 </div>
+                <span className='font-medium'>{payload.company_id}</span>
             </div>
             <Button onClick={onLogout} block>Log out</Button>
         </div>
@@ -38,7 +39,7 @@ const ProfileMenu = ({ payload, onLogout }: ProfileMenuProps) => {
     return (
         <Popover content={content} trigger='hover' placement='bottomRight'>
             <div className='text-[12px] font-medium cursor-pointer hover:text-[rgb(0,91,168)]'>
-                {payload.first_name} {payload.last_name}
+                {payload.first_name} {payload.last_name} - {payload.company_name}/{payload.company_type}
             </div>
         </Popover>
     );

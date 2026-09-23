@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Spin, Empty, Input, Button } from 'antd';
+import { Spin, Empty, Input, Button, message } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import FormSection from '../components/common/FormSection';
 import type { LoadProps } from '../components/Load/Load';
 import type { Stop } from '../types/Stop';
-import { getSingleDispatch } from '../services/dispatchService';
+import { getSingleDispatch, acceptDispatch } from '../services/dispatchService';
 import { inputClassNames } from '../components/common/inputStyles';
+import { useAuth } from '../contexts/AuthContext';
+import { getProblemDetails } from '../types/ApiError';
+import StatusBadge from '../components/common/StatusBadge';
 
 const valueInputClassNames = { ...inputClassNames, input: 'text-[16px] text-black' };
 const companyNameInputClassNames = { ...inputClassNames, input: 'text-[18px] text-[#003468] font-bold' };
@@ -33,8 +36,10 @@ const DetailPage = () => {
 
 const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
     const navigate = useNavigate();
+    const { payload } = useAuth();
     const [dispatch, setDispatch] = useState<LoadProps>();
     const [loading, setLoading] = useState(true);
+    const [accepting, setAccepting] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -43,6 +48,21 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
             .finally(() => { if (!cancelled) setLoading(false); });
         return () => { cancelled = true; };
     }, [dispatchId]);
+
+    const handleAccept = async () => {
+        if (!dispatchId) return;
+        setAccepting(true);
+        try {
+            await acceptDispatch(dispatchId);
+            setDispatch((current) => current && { ...current, dispatchStatus: 'PendingPickup' });
+            message.success('Dispatch accepted');
+        } catch (ex) {
+            const problem = getProblemDetails(ex);
+            message.error(problem?.title ?? 'Failed to accept dispatch');
+        } finally {
+            setAccepting(false);
+        }
+    };
 
     if (loading) {
         return <div className='flex items-center justify-center h-full'><Spin size='large' /></div>;
@@ -62,9 +82,19 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
                     <LeftOutlined style={{ fontSize: 14 }} />
                     <span>BACK TO DISPATCHES</span>
                 </div>
-                <Button type='primary' onClick={() => navigate(`/dispatch/${dispatchId}/edit`)}>
-                    Edit
-                </Button>
+                <div className='flex gap-2'>
+                    {payload?.company_type === 'Carrier' && dispatch.dispatchStatus === 'NotSigned' &&
+                        <Button type='primary' loading={accepting} onClick={handleAccept}>
+                            Accept
+                        </Button>
+                    }
+                    {payload?.company_type === 'Shipper' && dispatch.dispatchStatus === 'NotSigned' &&
+                        <Button type='primary' onClick={() => navigate(`/dispatch/${dispatchId}/edit`)}>
+                            Edit
+                        </Button>
+
+                    }
+                </div>
             </div>
             <h1 className='text-[28px] text-black font-bold'>Load Detail</h1>
             <div className='grid grid-cols-2 gap-3'>
@@ -82,6 +112,28 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
                         { key: 'shipperCompanyName', label: 'Company Name', input: <Input readOnly value={dispatch.shipperInfo.companyName} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={companyNameInputClassNames} size='small' /> },
                         { key: 'shipperCompanyPhone', label: 'Phone', input: <Input readOnly value={dispatch.shipperInfo.companyPhone} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
                         { key: 'shipperCompanyEmail', label: 'Email', input: <Input readOnly value={dispatch.shipperInfo.companyEmail} styles={{ root: { backgroundColor: 'rgba(0,0,0,0.04)' } }} classNames={valueInputClassNames} size='small' /> },
+                    ]}
+                />
+            </div>
+            <div className='grid grid-cols-2 gap-3'>
+                <FormSection
+                    sectionName='Status'
+                    fields={[
+                        {
+                            key: 'status', label: 'Status', input: (
+                                <div className='flex items-center h-7.5'>
+                                    <StatusBadge status={dispatch.dispatchStatus} />
+                                </div>
+                            )
+                        },
+                    ]}
+                />
+                <FormSection
+                    sectionName='Driver'
+                    fields={[
+                        { key: 'driverName', label: 'Full Name', input: <Input readOnly value={dispatch.driverInfo.fullName || '—'} styles={readOnlyStyles} classNames={companyNameInputClassNames} size='small' /> },
+                        { key: 'driverPhone', label: 'Phone', input: <Input readOnly value={dispatch.driverInfo.phone || '—'} styles={readOnlyStyles} classNames={valueInputClassNames} size='small' /> },
+                        { key: 'driverEmail', label: 'Email', input: <Input readOnly value={dispatch.driverInfo.email || '—'} styles={readOnlyStyles} classNames={valueInputClassNames} size='small' /> },
                     ]}
                 />
             </div>

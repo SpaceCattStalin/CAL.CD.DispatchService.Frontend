@@ -43,6 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode; }) {
     const [authState, dispatch] = useReducer(authReducer, initialState, createInitialState);
 
     const payload = decodeJwtPayload(authState.identity?.accessToken);
-
+    console.log(payload);
     return <AuthContext value={{ ...authState, dispatch, payload }}>{children}</AuthContext>;
 }

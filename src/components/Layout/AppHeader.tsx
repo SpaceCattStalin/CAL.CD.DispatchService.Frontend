@@ -25,7 +25,7 @@ const AppHeader = () => {
                 <img src={logo} alt='Logo' className='h-8 w-auto shrink-0 cursor-pointer' onClick={() => navigate("/")} />
                 <nav className='flex items-center h-full'>
                     <NavLink to='/' end className={tabClassName}>Loads</NavLink>
-                    <NavLink to='/create' className={tabClassName}>Creating</NavLink>
+                    {payload?.company_type === 'Shipper' && <NavLink to='/create' className={tabClassName}>Creating</NavLink>}
                 </nav>
             </div>
             <div className='flex items-center gap-3'>

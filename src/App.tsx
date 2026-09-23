@@ -7,7 +7,6 @@ import AppFooter from './components/Layout/AppFooter';
 const { Header, Footer } = Layout;
 
 function App() {
-
   return (
     <ConfigProvider theme={{
       components: {

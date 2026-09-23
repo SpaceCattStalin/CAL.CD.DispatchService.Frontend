@@ -5,8 +5,9 @@ import type { Vehicle } from '../../types/Vehicle';
 import type { Stop } from '../../types/Stop';
 import StatusBadge from '../common/StatusBadge';
 import { Button } from 'antd';
-import { createStaticStyles } from 'antd-style';
 import { useAuth } from '../../contexts/AuthContext';
+import { primaryButtonClassNames } from '../common/inputStyles';
+import { secondaryButtonClassNames } from './secondaryButtonClassNames';
 
 export type LoadProps = {
     dispatchId: string,
@@ -41,46 +42,12 @@ type Driver = {
 };
 
 
-// const buttonClassNames = createStaticStyles(({ css }) => ({
-//     root: css`
-//             background-color: rgb(0, 91, 168);
-
-//             :hover {
-//                 background-color: #2372B8 !important;
-//                 transition: all;
-//             }
-//         `,
-//     content: css`
-//             color:#fff;
-//         `
-// }));
-
-const secondaryButtonClassNames = createStaticStyles(({ css }) => ({
-    root: css`
-            background-color: transparent;
-            border: 1px solid rgb(0, 91, 168);
-
-            :hover {
-                background-color: #EBF6FF !important;
-                border-color: #2372B8 !important;
-                transition: all;
-            }
-        `,
-    content: css`
-            color: rgb(0, 91, 168);
-        `
-}));
-
-
-const Load = ({ load }: { load: LoadProps; }) => {
+const Load = ({ load, onModalOpen }: { load: LoadProps; onModalOpen: (load: LoadProps) => void; }) => {
     const navigate = useNavigate();
     const { payload } = useAuth();
-    console.log(payload?.company_type);
-    return (
-        <div className='rounded-sm flex flex-col border border-gray-500'>
-            <div>
 
-            </div>
+    return (
+        <div className='rounded-sm flex flex-col border border-gray-500 overflow-clip'>
             <div className='flex gap-2 items-center p-2'>
                 <div className='text-[#003468] font-bold text-[18px]'>
                     {load.dispatchId}
@@ -175,17 +142,42 @@ const Load = ({ load }: { load: LoadProps; }) => {
                     >
                         Detail
                     </Button>
-                    <Button
+                    {payload?.company_type === "Shipper" &&
+                        <Button
+                            type='primary'
+                            classNames={primaryButtonClassNames}
+                            onClick={() => navigate(`/dispatch/${load.dispatchId}/edit`)}
+                        >
+                            Edit
+                        </Button>}
+                    {(payload?.company_type === "Carrier" && load.dispatchStatus === 'NotSigned') &&
+                        <Button
+                            type='primary'
+                            classNames={primaryButtonClassNames}
+                            onClick={() => onModalOpen(load)}
+                        >
+                            Accept
+                        </Button>}
+
+                    {(payload?.company_type === "Carrier" && (load.dispatchStatus === 'PendingPickup' || load.dispatchStatus === 'PendingDelivery')) &&
+                        <Button
+                            type='primary'
+                            classNames={primaryButtonClassNames}
+                            onClick={() => onModalOpen(load)}
+                        >
+                            Update Status
+                        </Button>}
+                    {/* <Button
                         type='default'
                         classNames={secondaryButtonClassNames}
                         onClick={() => navigate(`/dispatch/${load.dispatchId}/edit`)}
                     >
                         Edit
-                    </Button>
+                    </Button> */}
                     {/* <Button type='primary' classNames={buttonClassNames}>Assign</Button> */}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

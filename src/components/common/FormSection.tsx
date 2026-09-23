@@ -16,7 +16,7 @@ export type FormSectionProps = {
     className?: string;
 };
 
-const fieldLabelClassName = 'text-[12px] text-[rgb(109,109,109)]';
+export const fieldLabelClassName = 'text-[12px] text-[rgb(109,109,109)]';
 const fieldErrorClassName = 'text-[11px] text-red-500';
 
 export const FieldError = ({ name }: { name: FormSectionFieldName; }) => {

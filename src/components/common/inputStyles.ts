@@ -166,6 +166,21 @@ export const selectClassNames = createStaticStyles(({ css }) => ({
         `
 }));
 
+export const primaryButtonClassNames = createStaticStyles(({ css }) => ({
+    root: css`
+            background-color: rgb(0, 91, 168);
+            font-weight: 600;
+
+            :hover {
+                background-color: #2372B8 !important;
+                transition: all;
+            }
+        `,
+    content: css`
+            color:#fff;
+        `
+}));
+
 export const collapseClassNames = createStaticStyles(({ css }) => ({
     root: css`
             background-color: transparent;

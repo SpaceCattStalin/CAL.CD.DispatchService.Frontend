@@ -6,6 +6,7 @@ import type { DispatchFormValues } from '../components/common/DispatchForm';
 import type { LoadProps } from '../components/Load/Load';
 import { getSingleDispatch, updateDispatch, toUpdateDispatchRequest, toDispatchFormValues } from '../services/dispatchService';
 import { LeftOutlined } from '@ant-design/icons';
+import { getProblemDetails } from '../types/ApiError';
 
 const UpdateDispatchPage = () => {
     const { dispatchId: localDispatchId } = useParams<{ dispatchId: string; }>();
@@ -60,8 +61,16 @@ const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | null; 
 
             const { location } = await updateDispatch(dispatch.dispatchId, toUpdateDispatchRequest(values));
             navigate(location);
-        } catch {
-            message.error('Failed to update dispatch');
+        } catch (ex) {
+            const problem = getProblemDetails(ex);
+            switch (problem?.status) {
+                case 403:
+                    message.error("Forbidden for this action");
+                    break;
+                default:
+                    message.error(problem?.title ?? 'Failed to update dispatch');
+            }
+
         } finally {
             setSubmitting(false);
         }

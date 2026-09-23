@@ -5,16 +5,12 @@ import { SearchOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import type { DispatchStatus } from '../../types/Dispatch';
 import { inputClassNames, numberClassNames, collapseClassNames } from './inputStyles';
+import { STATUS_LABELS } from './STATUS_LABELS';
 
 const { RangePicker } = DatePicker;
 
-const DISPATCH_STATUS_OPTIONS: { label: string; value: DispatchStatus; }[] = [
-    { label: 'Not Signed', value: 'NotSigned' },
-    { label: 'Pending Pickup', value: 'PendingPickup' },
-    { label: 'Pending Delivery', value: 'PendingDelivery' },
-    { label: 'Delivered', value: 'Delivered' },
-    { label: 'Canceled', value: 'Canceled' },
-];
+const DISPATCH_STATUS_OPTIONS: { label: string; value: DispatchStatus; }[] =
+    (Object.entries(STATUS_LABELS) as [DispatchStatus, string][]).map(([value, label]) => ({ label, value }));
 
 export type DispatchSearchFilters = {
     dispatchId: string | null;

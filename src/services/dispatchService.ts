@@ -249,8 +249,18 @@ export const createDispatch = async (request: CreateDispatchRequest): Promise<Di
     return { dispatch: toLoadProps(response.data), location: response.headers['location'] };
 };
 
+export const acceptDispatch = async (dispatchId: string | null): Promise<void> => {
+    await axiosInstance.put(`/dispatch/${dispatchId}/accept`);
+};
+
+export const assignDriver = async (dispatchId: string, driverId: string): Promise<void> => {
+    await axiosInstance.post(`/dispatch/${dispatchId}/assign-driver`, { driverId });
+};
+
 export const updateDispatch = async (dispatchId: string, request: UpdateDispatchRequest): Promise<DispatchMutationResult> => {
     const response = await axiosInstance.put<getDispatchResponse>(`/dispatch/${dispatchId}`, request);
+    console.log(response);
+
     return { dispatch: toLoadProps(response.data), location: response.headers['location'] };
 };
 
