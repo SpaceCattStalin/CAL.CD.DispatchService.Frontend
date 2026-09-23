@@ -6,11 +6,12 @@ import type { DispatchFormValues } from '../components/common/DispatchForm';
 import type { LoadProps } from '../components/Load/Load';
 import { getSingleDispatch, updateDispatch, toUpdateDispatchRequest, toDispatchFormValues } from '../services/dispatchService';
 import { LeftOutlined } from '@ant-design/icons';
+import { getProblemDetails } from '../types/ApiError';
 
 const UpdateDispatchPage = () => {
-    const { dispatchId : localDispatchId } = useParams<{ dispatchId: string; }>();
+    const { dispatchId: localDispatchId } = useParams<{ dispatchId: string; }>();
     const parsedDispatchId = localDispatchId ?? null;
-    
+
     return <UpdateDispatchPageContent key={parsedDispatchId} dispatchId={parsedDispatchId} />;
 };
 
@@ -39,10 +40,37 @@ const UpdateDispatchPageContent = ({ dispatchId }: { dispatchId: string | null; 
     const handleFinish = async (values: DispatchFormValues) => {
         setSubmitting(true);
         try {
-            await updateDispatch(dispatch.dispatchId, toUpdateDispatchRequest(values));
-            navigate('/');
-        } catch {
-            message.error('Failed to update dispatch');
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            // Add 1 second to account for the time the request get to the server
+            // Maybe bug badly in production
+            const seconds = now.getSeconds() + 1;
+            values = {
+                ...values,
+                pickupDate: values["pickupDate"]
+                    .add(hours, "hour")
+                    .add(minutes, "minute")
+                    .add(seconds, "second"),
+                dropoffDate: values["dropoffDate"]
+                    .add(hours, "hour")
+                    .add(minutes, "minute")
+                    .add(seconds, "second")
+            };
+
+
+            const { location } = await updateDispatch(dispatch.dispatchId, toUpdateDispatchRequest(values));
+            navigate(location);
+        } catch (ex) {
+            const problem = getProblemDetails(ex);
+            switch (problem?.status) {
+                case 403:
+                    message.error("Forbidden for this action");
+                    break;
+                default:
+                    message.error(problem?.title ?? 'Failed to update dispatch');
+            }
+
         } finally {
             setSubmitting(false);
         }

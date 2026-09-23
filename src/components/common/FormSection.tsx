@@ -1,24 +1,39 @@
 import type { ReactNode } from 'react';
+import { Form } from 'antd';
+
+export type FormSectionFieldName = string | number | (string | number)[];
 
 export type FormSectionField = {
     key: string;
     label: string;
-    input: ReactNode; // already wrapped in <Form.Item name=... noStyle> by the caller
+    name?: FormSectionFieldName;
+    input: ReactNode;
 };
 
 export type FormSectionProps = {
     sectionName: string;
-    // Each entry is one row. A single field renders full-width;
-    // an array of fields renders them side-by-side in that row (e.g. pickup/dropoff dates).
     fields: (FormSectionField | FormSectionField[])[];
     className?: string;
 };
 
-const fieldLabelClassName = 'text-[12px] text-[rgb(109,109,109)]';
+export const fieldLabelClassName = 'text-[12px] text-[rgb(109,109,109)]';
+const fieldErrorClassName = 'text-[11px] text-red-500';
+
+export const FieldError = ({ name }: { name: FormSectionFieldName; }) => {
+    const form = Form.useFormInstance();
+    return (
+        <Form.Item noStyle shouldUpdate>
+            {() => {
+                const errors = form.getFieldError(name);
+                return errors.length > 0 ? <span className={fieldErrorClassName}>{errors[0]}</span> : null;
+            }}
+        </Form.Item>
+    );
+};
 
 const FormSection = ({ sectionName, fields, className = '' }: FormSectionProps) => {
     return (
-        <div className={`rounded-sm flex flex-col border border-gray-500 ${className} self-stretch h-full`}>
+        <div className={`rounded-sm flex flex-col border overflow-clip border-gray-500 ${className} self-stretch h-full`}>
             <div className='text-[#003468] font-semibold bg-gray-200 py-2 px-3 text-[18px]'>
                 {sectionName}
             </div>
@@ -32,6 +47,7 @@ const FormSection = ({ sectionName, fields, className = '' }: FormSectionProps) 
                                 <div key={field.key} className='flex flex-col items-start gap-0.5 w-full'>
                                     <label className={fieldLabelClassName}>{field.label}</label>
                                     {field.input}
+                                    {field.name !== undefined && <FieldError name={field.name} />}
                                 </div>
                             ))}
                         </div>

@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
 import axiosInstance from "./axiosInstance";
 import type { DispatchStatus } from "../types/Dispatch";
-import type { LoadProps } from "../components/Load/Load";
+import type { LoadProps, Company } from "../components/Load/Load";
 import type { DispatchSearchFilters } from "../components/common/SearchFilters";
+import type { SortValue, SortField } from "../components/common/SortControl";
 import type { DispatchFormValues } from "../components/common/DispatchForm";
 import type { Stop } from "../types/Stop";
 
@@ -36,10 +37,17 @@ type DriverResponse = {
     email: string;
 };
 
+type CompanyResponse = {
+    companyId: string;
+    companyName: string;
+    companyPhone: string;
+    companyEmail: string;
+};
+
 type getDispatchResponse = {
     dispatchId: string;
-    shipperId: string;
-    carrierId: string;
+    shipper: CompanyResponse | null;
+    carrier: CompanyResponse | null;
     dispatchStatus: DispatchStatus;
     price: number;
     pickupDate: string;
@@ -51,9 +59,6 @@ type getDispatchResponse = {
     vehicles: VehicleResponse[] | null;
     drivers: DriverResponse[] | null;
     createdAt: string;
-    carrierCompanyName: string;
-    carrierCompanyPhone: string;
-    carrierCompanyEmail: string;
 };
 
 type getDispatchBatchResponse = {
@@ -67,6 +72,13 @@ export type DispatchBatchResult = {
     total: number;
 };
 
+type SortDirectionRequest = 'ASCENDING' | 'DESCENDING';
+
+type SortFieldRequest = {
+    name: string;
+    direction: SortDirectionRequest;
+};
+
 type DispatchSearchRequestModel = {
     priceTotalMin: number | null;
     priceTotalMax: number | null;
@@ -78,16 +90,21 @@ type DispatchSearchRequestModel = {
     vehicleVin: string | null;
     size: number | null;
     currentPage: number | null;
+    sortFields: SortFieldRequest[];
 };
 
+// Maps the frontend's sort field keys to the backend's sortable property names.
+const SORT_FIELD_NAME_MAP: Record<SortField, string> = {
+    createdAt: 'createdAt',
+    price: 'priceTotal',
+};
 
 export const buildDispatchSearchRequest = (
     filters: DispatchSearchFilters,
     currentPage = 1,
     pageSize = 10,
+    sort?: SortValue,
 ): DispatchSearchRequestModel => {
-    console.log('priceMin', typeof filters.priceMin, filters.priceMin);
-
     return {
         priceTotalMin: filters.priceMin ?? null,
         priceTotalMax: filters.priceMax ?? null,
@@ -98,7 +115,10 @@ export const buildDispatchSearchRequest = (
         dispatchStatus: filters.status?.map((status) => status) ?? null,
         vehicleVin: filters.vin ?? null,
         size: pageSize,
-        currentPage
+        currentPage,
+        sortFields: sort
+            ? [{ name: SORT_FIELD_NAME_MAP[sort.field], direction: sort.direction === 'asc' ? 'ASCENDING' : 'DESCENDING' }]
+            : [],
     };
 };
 
@@ -125,6 +145,12 @@ const toStop = (stop: StopResponse | null): Stop => ({
     contactEmail: stop?.contactEmail ?? '',
 });
 
+const toCompany = (company: CompanyResponse | null): Company => ({
+    companyName: company?.companyName ?? '',
+    companyPhone: company?.companyPhone ?? '',
+    companyEmail: company?.companyEmail ?? '',
+});
+
 const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
     const [firstDriver] = dispatch.drivers ?? [];
     const pickupStop = toStop(dispatch.pickupStop);
@@ -141,11 +167,8 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
         dropoffDate: new Date(dispatch.dropoffDate),
         description: dispatch.description ?? '',
 
-        carrierInfo: {
-            carrierCompanyName: dispatch.carrierCompanyName,
-            carrierCompanyPhone: dispatch.carrierCompanyPhone,
-            carrierCompanyEmail: dispatch.carrierCompanyEmail
-        },
+        carrierInfo: toCompany(dispatch.carrier),
+        shipperInfo: toCompany(dispatch.shipper),
 
         driverInfo: firstDriver
             ? {
@@ -216,14 +239,29 @@ type UpdateDispatchRequest = {
     vehicles: UpdateVehicleRequest[];
 };
 
-export const createDispatch = async (request: CreateDispatchRequest): Promise<LoadProps> => {
-    const response = await axiosInstance.post<getDispatchResponse>('/dispatch', request);
-    return toLoadProps(response.data);
+export type DispatchMutationResult = {
+    dispatch: LoadProps;
+    location: string;
 };
 
-export const updateDispatch = async (dispatchId: string, request: UpdateDispatchRequest): Promise<LoadProps> => {
+export const createDispatch = async (request: CreateDispatchRequest): Promise<DispatchMutationResult> => {
+    const response = await axiosInstance.post<getDispatchResponse>('/dispatch', request);
+    return { dispatch: toLoadProps(response.data), location: response.headers['location'] };
+};
+
+export const acceptDispatch = async (dispatchId: string | null): Promise<void> => {
+    await axiosInstance.put(`/dispatch/${dispatchId}/accept`);
+};
+
+export const assignDriver = async (dispatchId: string, driverId: string): Promise<void> => {
+    await axiosInstance.post(`/dispatch/${dispatchId}/assign-driver`, { driverId });
+};
+
+export const updateDispatch = async (dispatchId: string, request: UpdateDispatchRequest): Promise<DispatchMutationResult> => {
     const response = await axiosInstance.put<getDispatchResponse>(`/dispatch/${dispatchId}`, request);
-    return toLoadProps(response.data);
+    console.log(response);
+
+    return { dispatch: toLoadProps(response.data), location: response.headers['location'] };
 };
 
 export const toCreateDispatchRequest = (values: DispatchFormValues): CreateDispatchRequest => ({

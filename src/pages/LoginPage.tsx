@@ -35,6 +35,7 @@ const LoginPage = () => {
     const [form] = Form.useForm<LoginFormValues>();
     const [submitting, setSubmitting] = useState<boolean>(false);
     const { dispatch } = useAuth();
+
     const handleFinish = async (values: LoginFormValues) => {
         setSubmitting(true);
         try {

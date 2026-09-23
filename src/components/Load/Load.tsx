@@ -5,7 +5,9 @@ import type { Vehicle } from '../../types/Vehicle';
 import type { Stop } from '../../types/Stop';
 import StatusBadge from '../common/StatusBadge';
 import { Button } from 'antd';
-import { createStaticStyles } from 'antd-style';
+import { useAuth } from '../../contexts/AuthContext';
+import { primaryButtonClassNames } from '../common/inputStyles';
+import { secondaryButtonClassNames } from './secondaryButtonClassNames';
 
 export type LoadProps = {
     dispatchId: string,
@@ -14,6 +16,7 @@ export type LoadProps = {
     dispatchStatus: StatusBadgeProps['status'],
     pickupDate: Date,
     carrierInfo: Company,
+    shipperInfo: Company,
     driverInfo: Driver,
     dropoffLocation: string,
     dropoffStop: Stop,
@@ -26,9 +29,9 @@ export type LoadProps = {
 };
 
 export type Company = {
-    carrierCompanyName: string,
-    carrierCompanyPhone: string,
-    carrierCompanyEmail: string;
+    companyName: string,
+    companyPhone: string,
+    companyEmail: string;
 };
 
 type Driver = {
@@ -39,45 +42,12 @@ type Driver = {
 };
 
 
-const buttonClassNames = createStaticStyles(({ css }) => ({
-    root: css`
-            background-color: rgb(0, 91, 168);
-
-            :hover {
-                background-color: #2372B8 !important;
-                transition: all;
-            }
-        `,
-    content: css`
-            color:#fff;
-        `
-}));
-
-const secondaryButtonClassNames = createStaticStyles(({ css }) => ({
-    root: css`
-            background-color: transparent;
-            border: 1px solid rgb(0, 91, 168);
-
-            :hover {
-                background-color: #EBF6FF !important;
-                border-color: #2372B8 !important;
-                transition: all;
-            }
-        `,
-    content: css`
-            color: rgb(0, 91, 168);
-        `
-}));
-
-
-const Load = ({ load }: { load: LoadProps; }) => {
+const Load = ({ load, onModalOpen }: { load: LoadProps; onModalOpen: (load: LoadProps) => void; }) => {
     const navigate = useNavigate();
+    const { payload } = useAuth();
 
     return (
-        <div className='rounded-sm flex flex-col border border-gray-500'>
-            <div>
-
-            </div>
+        <div className='rounded-sm flex flex-col border border-gray-500 overflow-clip'>
             <div className='flex gap-2 items-center p-2'>
                 <div className='text-[#003468] font-bold text-[18px]'>
                     {load.dispatchId}
@@ -99,12 +69,18 @@ const Load = ({ load }: { load: LoadProps; }) => {
                         <div className='text-[12px] text-[rgb(109,109,109)]'>Dispatch Date</div>
                         <div className='text-[18px] text-black'>{load.pickupDate.toLocaleDateString()}</div>
                     </div>
-                    <div className='flex flex-col'>
+                    {payload?.company_type === 'Shipper' && <div className='flex flex-col'>
                         <div className='text-[12px] text-[rgb(109,109,109)]'>Carrier Info</div>
-                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.carrierInfo.carrierCompanyName}</span>
-                        <span className='text-[14px] text-black'>{load.carrierInfo.carrierCompanyEmail}</span>
-                        <span className='text-[14px] text-black'>{load.carrierInfo.carrierCompanyPhone}</span>
-                    </div>
+                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.carrierInfo.companyName}</span>
+                        <span className='text-[14px] text-black'>{load.carrierInfo.companyEmail}</span>
+                        <span className='text-[14px] text-black'>{load.carrierInfo.companyPhone}</span>
+                    </div>}
+                    {payload?.company_type === 'Carrier' && <div className='flex flex-col'>
+                        <div className='text-[12px] text-[rgb(109,109,109)]'>Shipper Info</div>
+                        <span className='text-[18px] text-[rgb(0,91,168)]'>{load.shipperInfo.companyName}</span>
+                        <span className='text-[14px] text-black'>{load.shipperInfo.companyEmail}</span>
+                        <span className='text-[14px] text-black'>{load.shipperInfo.companyPhone}</span>
+                    </div>}
                 </div>
                 <div className='flex flex-col'>
                     <div className='text-[#003468] font-bold'>
@@ -166,17 +142,42 @@ const Load = ({ load }: { load: LoadProps; }) => {
                     >
                         Detail
                     </Button>
-                    <Button
+                    {payload?.company_type === "Shipper" &&
+                        <Button
+                            type='primary'
+                            classNames={primaryButtonClassNames}
+                            onClick={() => navigate(`/dispatch/${load.dispatchId}/edit`)}
+                        >
+                            Edit
+                        </Button>}
+                    {(payload?.company_type === "Carrier" && load.dispatchStatus === 'NotSigned') &&
+                        <Button
+                            type='primary'
+                            classNames={primaryButtonClassNames}
+                            onClick={() => onModalOpen(load)}
+                        >
+                            Accept
+                        </Button>}
+
+                    {(payload?.company_type === "Carrier" && (load.dispatchStatus === 'PendingPickup' || load.dispatchStatus === 'PendingDelivery')) &&
+                        <Button
+                            type='primary'
+                            classNames={primaryButtonClassNames}
+                            onClick={() => onModalOpen(load)}
+                        >
+                            Update Status
+                        </Button>}
+                    {/* <Button
                         type='default'
                         classNames={secondaryButtonClassNames}
                         onClick={() => navigate(`/dispatch/${load.dispatchId}/edit`)}
                     >
                         Edit
-                    </Button>
+                    </Button> */}
                     {/* <Button type='primary' classNames={buttonClassNames}>Assign</Button> */}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -1,22 +1,15 @@
 import type { DispatchStatus } from '../../types/Dispatch';
+import { STATUS_LABELS } from './STATUS_LABELS';
 
 export type StatusBadgeProps = {
     status: DispatchStatus;
 };
 
-const STATUS_LABELS: Record<DispatchStatus, string> = {
-    NotSigned: 'Not Signed',
-    PendingPickup: 'Pending Pickup',
-    PendingDelivery: 'Pending Delivery',
-    Delivered: 'Delivered',
-    Canceled: 'Canceled',
-};
-
 const StatusBadge = ({ status }: StatusBadgeProps) => {
     const statusStyle: Record<DispatchStatus, string> = {
-        "NotSigned": "bg-[rgb(255,243,205)] text-[rgb(133,100,4)]",
-        "PendingPickup": "bg-[rgb(224,231,255)] text-[rgb(55,65,163)]",
-        "PendingDelivery": "bg-[rgb(204,246,247)] text-[rgb(13,111,120)]",
+        "NotSigned": "bg-[#00AAA8] text-white",
+        "PendingPickup": "bg-[#C1DFF2] text-[#2372A2]",
+        "PendingDelivery": "bg-[#2372A2] text-white",
         "Delivered": "bg-[rgb(201,234,191)] text-[rgb(43,102,32)]",
         "Canceled": "bg-[rgb(255,209,209)] text-[rgb(163,29,29)]"
     };

@@ -22,19 +22,23 @@ export const filterDispatches = (
             return false;
         }
 
-        if (!isWithinDateRange(dispatch.pickupDate, filters.pickupDateRange)) {
+        // if (!isWithinDateRange(dispatch.pickupDate, filters.pickupDateRange)) {
+        //     return false;
+        // }
+
+        // if (!isWithinDateRange(dispatch.dropoffDate, filters.dropoffDateRange)) {
+        //     return false;
+        // }
+
+        if (filters.priceMin !== null && dispatch.price < filters.priceMin) {
             return false;
+        } else {
+            console.log("+===========================+");
+            console.log(typeof filters.priceMin);
+            console.log(filters.priceMin);
         }
 
-        if (!isWithinDateRange(dispatch.dropoffDate, filters.dropoffDateRange)) {
-            return false;
-        }
-
-        if (filters.priceMin !== undefined && dispatch.price < filters.priceMin) {
-            return false;
-        }
-
-        if (filters.priceMax !== undefined && dispatch.price > filters.priceMax) {
+        if (filters.priceMax !== null && dispatch.price > filters.priceMax) {
             return false;
         }
 

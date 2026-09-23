@@ -10,16 +10,22 @@ import LoadPage from './pages/LoadPage.tsx';
 import DetailPage from './pages/DetailPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import { AuthProvider } from './contexts/AuthProvider.tsx';
+import RequireAuth from './contexts/RequireAuth.tsx';
+import RequireCompanyType from './contexts/RequireCompanyType.tsx';
+dayjs.extend(utc);
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: <RequireAuth><App /></RequireAuth>,
     children: [
       { index: true, element: <LoadPage /> },
-      { path: 'create', element: <CreateDispatchPage /> },
+      { path: 'create', element: <RequireCompanyType allow={['Shipper']}><CreateDispatchPage /></RequireCompanyType> },
       { path: 'dispatch/:dispatchId', element: <DetailPage /> },
-      { path: 'dispatch/:dispatchId/edit', element: <UpdateDispatchPage /> }
+      { path: 'dispatch/:dispatchId/edit', element: <RequireCompanyType allow={['Shipper']}><UpdateDispatchPage /></RequireCompanyType> }
     ]
   },
   {
@@ -33,8 +39,11 @@ const router = createBrowserRouter([
   }
 ]);
 
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );

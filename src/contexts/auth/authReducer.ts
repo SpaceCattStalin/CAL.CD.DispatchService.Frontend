@@ -1,6 +1,7 @@
 import type { AuthState } from "../../types/Auth";
 import type { PayloadAction } from "../AuthContext";
 
+
 export const authReducer = (state: AuthState, action: PayloadAction<AuthState>) => {
     switch (action.type) {
         case 'SIGN_IN':
@@ -8,7 +9,7 @@ export const authReducer = (state: AuthState, action: PayloadAction<AuthState>) 
         case 'SIGN_OUT':
             localStorage.removeItem("identity");
             localStorage.removeItem("isAuthenticated");
-            return { isAuthenticated: false, isInitialized: true };
+            return { isAuthenticated: false };
         default:
             return state;
     }

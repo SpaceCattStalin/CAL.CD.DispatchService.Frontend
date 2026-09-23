@@ -14,8 +14,10 @@ export interface AuthContextType extends AuthState {
 
 export const initialState: AuthState = {
     isAuthenticated: false,
-    identity: null
+    identity: null,
+    payload: null
 };
+
 
 export const AuthContext = createContext<AuthContextType>({
     ...initialState,
