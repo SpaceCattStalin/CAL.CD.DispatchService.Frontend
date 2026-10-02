@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { StatusBadgeProps } from '../common/StatusBadge';
 import type { Vehicle } from '../../types/Vehicle';
@@ -26,6 +25,7 @@ export type LoadProps = {
     listingCreatedAt: Date,
     listingUpdatedAt: Date,
     price: number;
+    createdAt?: Date;
 };
 
 export type Company = {
@@ -49,7 +49,9 @@ const Load = ({ load, onModalOpen }: { load: LoadProps; onModalOpen: (load: Load
     return (
         <div className='rounded-sm flex flex-col border border-gray-500 overflow-clip'>
             <div className='flex gap-2 items-center p-2'>
-                <div className='text-[#003468] font-bold text-[18px]'>
+                <div className='text-[#003468] font-bold text-[18px] cursor-pointer'
+                    onClick={() => navigate(`/dispatch/${load.dispatchId}`)}
+                >
                     {load.dispatchId}
                 </div>
                 <div>
@@ -131,6 +133,11 @@ const Load = ({ load, onModalOpen }: { load: LoadProps; onModalOpen: (load: Load
                         Destination
                     </div>
                     <div className='text-[18px] text-black'>{load.dropoffLocation}</div>
+
+                    <div className='text-[#003468] font-bold'>
+                        Created At
+                    </div>
+                    <div className='text-[18px] text-black'>{load.createdAt?.toLocaleDateString()}</div>
                 </div>
             </div>
             <div className='flex items-center justify-end bg-gray-200 py-2 px-4'>
@@ -150,7 +157,7 @@ const Load = ({ load, onModalOpen }: { load: LoadProps; onModalOpen: (load: Load
                         >
                             Edit
                         </Button>}
-                    {(payload?.company_type === "Carrier" && load.dispatchStatus === 'NotSigned') &&
+                    {(payload?.company_type === "Carrier" && load.dispatchStatus === 'NotSigned' && payload?.role !== 'Driver') &&
                         <Button
                             type='primary'
                             classNames={primaryButtonClassNames}
@@ -159,7 +166,7 @@ const Load = ({ load, onModalOpen }: { load: LoadProps; onModalOpen: (load: Load
                             Accept
                         </Button>}
 
-                    {(payload?.company_type === "Carrier" && (load.dispatchStatus === 'PendingPickup' || load.dispatchStatus === 'PendingDelivery')) &&
+                    {(payload?.company_type === "Carrier" && (load.dispatchStatus === 'PendingPickup' || load.dispatchStatus === 'PendingDelivery') && payload?.role !== 'Driver') &&
                         <Button
                             type='primary'
                             classNames={primaryButtonClassNames}

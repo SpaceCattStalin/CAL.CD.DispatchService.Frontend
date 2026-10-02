@@ -13,7 +13,8 @@ export type ProblemDetails = {
 
 // Thrown for model/validation failures (400s); adds field-level error messages.
 export type ValidationProblemDetails = ProblemDetails & {
-    errors?: Record<string, string[]>;
+    // Values are usually string[] but can be a single string; the whole field can even be a plain string.
+    errors?: string | Record<string, string | string[]>;
 };
 
 export const isProblemDetails = (value: unknown): value is ProblemDetails =>
@@ -22,8 +23,23 @@ export const isProblemDetails = (value: unknown): value is ProblemDetails =>
     'title' in value &&
     'status' in value;
 
-export const getProblemDetails = (ex: unknown): ProblemDetails | null => {
-    const err = ex as AxiosError<ProblemDetails>;
+export const getProblemDetails = (ex: unknown): ValidationProblemDetails | null => {
+    const err = ex as AxiosError<ValidationProblemDetails>;
     const data = err?.response?.data;
+
     return isProblemDetails(data) ? data : null;
+};
+
+// Flattens `errors` (string | string[] per field, or a bare string) into a message list.
+export const getErrorMessages = (problem: ValidationProblemDetails | null): string[] => {
+    const errors = problem?.errors;
+    if (!errors) return [];
+    if (typeof errors === 'string') return [errors];
+    return Object.values(errors).flat();
+};
+
+// One displayable string: field messages if any, else the title, else the fallback.
+export const getErrorText = (problem: ValidationProblemDetails | null, fallback: string): string => {
+    const messages = getErrorMessages(problem);
+    return messages.length > 0 ? messages.join(' ') : (problem?.title ?? fallback);
 };

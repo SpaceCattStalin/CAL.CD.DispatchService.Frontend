@@ -9,6 +9,7 @@ import UpdateDispatchPage from './pages/UpdateDispatchPage.tsx';
 import LoadPage from './pages/LoadPage.tsx';
 import DetailPage from './pages/DetailPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
+import UnauthorizedPage from './pages/UnauthorizedPage.tsx';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -23,11 +24,12 @@ const router = createBrowserRouter([
     element: <RequireAuth><App /></RequireAuth>,
     children: [
       { index: true, element: <LoadPage /> },
-      { path: 'create', element: <RequireCompanyType allow={['Shipper']}><CreateDispatchPage /></RequireCompanyType> },
+      { path: 'create', element: <RequireCompanyType allow={['Shipper', 'Carrier']}><CreateDispatchPage /></RequireCompanyType> },
       { path: 'dispatch/:dispatchId', element: <DetailPage /> },
       { path: 'dispatch/:dispatchId/edit', element: <RequireCompanyType allow={['Shipper']}><UpdateDispatchPage /></RequireCompanyType> }
     ]
   },
+  { path: 'unauthorized', element: <UnauthorizedPage /> },
   {
     path: 'account',
     children: [

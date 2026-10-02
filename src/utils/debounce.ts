@@ -1,7 +1,8 @@
 import type { DispatchSearchFilters } from "../components/common/SearchFilters";
 import type { SortValue } from "../components/common/SortControl";
 
-export const debounce = (func: (values: DispatchSearchFilters, size: number, sort: SortValue) => void, delay: number) => {
+export const debounce = (func: (values: DispatchSearchFilters,
+    size: number, sort: SortValue) => void, delay: number) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     return (values: DispatchSearchFilters, size: number, sort: SortValue) => {

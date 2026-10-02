@@ -72,7 +72,7 @@ const rangePickerClassNames = createStaticStyles(({ css }) => ({
 type SearchFiltersProps = {
     form: FormInstance<DispatchSearchFilters>;
     onFinish: (values: DispatchSearchFilters) => void;
-    onDispatchIdChange: (value: string) => void;
+    onDispatchIdChange: (value: string | null) => void;
     onReset: () => void;
 };
 
@@ -83,9 +83,12 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                 form={form}
                 layout='vertical'
                 onValuesChange={(changedValues, allValues) => {
-                    if ('dispatchId' in changedValues || 'vin' in changedValues) {
+                    if ('dispatchId' in changedValues) {
                         return;
-                    } else {
+                    } else if ('vin' in changedValues) {
+                        return;
+                    }
+                    else {
                         onFinish(allValues);
                     }
                 }}
@@ -100,11 +103,10 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                                 <div className='flex flex-col items-start gap-0.5'>
                                     <label htmlFor='dispatchId' className='text-[10px] text-[rgb(109,109,109)]'>Load ID</label>
                                     <Form.Item name='dispatchId' noStyle>
-
                                         <Input
                                             id='dispatchId'
                                             allowClear
-                                            onClear={onReset}
+                                            onClear={() => onDispatchIdChange(null)}
                                             classNames={inputClassNames}
                                             placeholder='ID Number'
                                             size='small'
@@ -173,7 +175,8 @@ const SearchFilters = ({ form, onFinish, onReset, onDispatchIdChange }: SearchFi
                                     <div className='flex flex-col items-start gap-0.5 w-full'>
                                         <label htmlFor='priceMin' className={fieldLabelClassName}>Min Price</label>
                                         <Form.Item name='priceMin' noStyle>
-                                            <InputNumber id='priceMin' classNames={numberClassNames} size='small' prefix='$' placeholder='Min' className='w-full' controls={false} />
+                                            <InputNumber id='priceMin' classNames={numberClassNames} size='small' prefix='$' placeholder='Min' className='w-full' controls={false}
+                                                suffix={<></>} />
                                         </Form.Item>
                                     </div>
                                     <div className='flex flex-col items-start gap-0.5 w-full'>

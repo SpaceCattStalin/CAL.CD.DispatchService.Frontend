@@ -83,12 +83,12 @@ const DetailPageContent = ({ dispatchId }: { dispatchId: string | null; }) => {
                     <span>BACK TO DISPATCHES</span>
                 </div>
                 <div className='flex gap-2'>
-                    {payload?.company_type === 'Carrier' && dispatch.dispatchStatus === 'NotSigned' &&
+                    {payload?.company_type === 'Carrier' && dispatch.dispatchStatus === 'NotSigned' && payload?.role !== 'Driver' &&
                         <Button type='primary' loading={accepting} onClick={handleAccept}>
                             Accept
                         </Button>
                     }
-                    {payload?.company_type === 'Shipper' && dispatch.dispatchStatus === 'NotSigned' &&
+                    {payload?.company_type === 'Shipper' && dispatch.dispatchStatus === 'NotSigned' && payload?.role !== 'Driver' &&
                         <Button type='primary' onClick={() => navigate(`/dispatch/${dispatchId}/edit`)}>
                             Edit
                         </Button>

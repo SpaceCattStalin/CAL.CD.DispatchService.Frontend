@@ -116,7 +116,12 @@ const renderStopFields = (stopName: 'pickupStop' | 'dropoffStop') => [
                             min: 10, max: 12, message: 'Phone number must between 10 and 12 characters long'
                         },
                         {
-                            pattern: /^1?[\s-]?(\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{4}$/,
+                            pattern: // Source - https://stackoverflow.com/a/29767609
+                                // Posted by EeeeeK, modified by community. See post 'Timeline' for change history
+                                // Retrieved 2026-09-29, License - CC BY-SA 4.0
+
+                                /^[+]?[0-9]{0,3}\W?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im
+                            ,
                             message: 'Please enter a valid phone number'
                         }
                     ]}
@@ -149,6 +154,7 @@ const renderStopFields = (stopName: 'pickupStop' | 'dropoffStop') => [
 
 const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitting, onFinish }: DispatchFormProps) => {
     const navigate = useNavigate();
+    const isLocked = mode === 'update' && (statusDisplay === 'PendingDelivery' || statusDisplay === 'Delivered' || statusDisplay === 'Canceled');
     const [form] = Form.useForm<DispatchFormValues>();
     const [carrierOptions, setCarrierOptions] = useState<CarrierOption[]>([]);
     const [carriersLoading, setCarriersLoading] = useState(mode === 'create');
@@ -171,6 +177,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
             layout='vertical'
             initialValues={initialValues}
             onFinish={onFinish}
+            disabled={isLocked}
             onFinishFailed={({ errorFields }) => console.log('Form validation failed', errorFields)}
             className='flex flex-col gap-4'
         >
@@ -267,7 +274,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                         ]}
                                             noStyle
                                         >
-                                            <DatePicker classNames={datePickerClassNames} size='small' className='w-full' onChange={(e) => console.log(e?.utc())} />
+                                            <DatePicker classNames={datePickerClassNames} disabled={isLocked} size='small' className='w-full' onChange={(e) => console.log(e?.utc())} />
                                         </Form.Item>
                                     )
                                 },
@@ -284,7 +291,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                                 }
                                             ]}
                                             noStyle>
-                                            <DatePicker classNames={datePickerClassNames} size='small' className='w-full' />
+                                            <DatePicker classNames={datePickerClassNames} disabled={isLocked} size='small' className='w-full' />
                                         </Form.Item>
                                     )
                                 },
@@ -385,7 +392,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
                                                                             ]}
                                                                             noStyle
                                                                         >
-                                                                            <Select classNames={selectClassNames} size='small' showSearch={{ optionFilterProp: 'label' }} options={VEHICLE_YEAR_OPTIONS} placeholder='Year' />
+                                                                            <Select classNames={selectClassNames} size='small' suffix={<></>} showSearch={{ optionFilterProp: 'label' }} options={VEHICLE_YEAR_OPTIONS} placeholder='Year' />
                                                                         </Form.Item>
                                                                         <FieldError name={['vehicles', field.name, 'year']} />
                                                                     </div>
@@ -438,7 +445,7 @@ const DispatchForm = ({ mode, initialValues, carrierInfo, statusDisplay, submitt
             />
 
             <div className='flex justify-end gap-2'>
-                <Button onClick={() => navigate('/')}>Cancel</Button>
+                <Button disabled={false} onClick={() => navigate('/')}>Cancel</Button>
                 <Button type='primary' htmlType='submit' loading={submitting}>
                     {mode === 'create' ? 'Create Dispatch' : 'Save Changes'}
                 </Button>

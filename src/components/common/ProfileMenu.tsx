@@ -27,6 +27,10 @@ const ProfileMenu = ({ payload, onLogout }: ProfileMenuProps) => {
                     <span className='font-medium'>{payload.role}</span>
                 </div>
                 <div className='flex justify-between gap-4'>
+                    <span className='text-[#6a7282]'>Company Name</span>
+                    <span className='font-medium'>{payload.company_name}</span>
+                </div>
+                <div className='flex justify-between gap-4'>
                     <span className='text-[#6a7282]'>Company Type</span>
                     <span className='font-medium'>{payload.company_type}</span>
                 </div>

@@ -13,7 +13,7 @@ import { debounce, debounceSeek } from '../utils/debounce';
 import { DollarCircleOutlined, CarOutlined, UserOutlined } from '@ant-design/icons';
 import { fieldLabelClassName } from '../components/common/FormSection';
 import { primaryButtonClassNames, selectClassNames } from '../components/common/inputStyles';
-import { getProblemDetails } from '../types/ApiError';
+import { getProblemDetails, getErrorText } from '../types/ApiError';
 
 const LoadPage = () => {
   const [form] = Form.useForm<DispatchSearchFilters>();
@@ -41,8 +41,6 @@ const LoadPage = () => {
   }, [modalOpen]);
 
   const runSearch = (request: ReturnType<typeof buildDispatchSearchRequest>) => {
-    setLoading(true);
-
     return getDispatchBatch(request)
       .then(({ items, total }) => {
         setVisibleDispatches(items);
@@ -112,10 +110,40 @@ const LoadPage = () => {
   };
 
   const handleDispatchIdChange = (value: string | null) => {
-    if (!value) {
-      setSeekedDispatch(null);
+    try {
+      if (value === null) {
+        setSeekedDispatch(null);
+        // A failed seek empties the list (see runSeek), so reload it after clearing
+        if (visibleDispatches.length === 0) {
+          setCurrentPage(1);
+          setLoading(true);
+          runSearch(buildDispatchSearchRequest({
+            ...form.getFieldsValue(),
+            dispatchId: null
+          }, 1, pageSize, sortValue));
+        }
+        return;
+      }
+      debouncedSeek(value);
+    } catch (ex) {
+      const problem = getProblemDetails(ex);
+      switch (problem?.status) {
+        case 404:
+          handleSearch({
+            dispatchId: null,
+            status: null,
+            pickupDateRange: null,
+            dropoffDateRange: null,
+            priceMin: null,
+            priceMax: null,
+            vin: null
+          });
+          break;
+        default:
+          message.error(getErrorText(problem, 'Failed to find dispatch'));
+      }
     }
-    debouncedSeek(value);
+
   };
 
   const handlePageChange = (page: number, size: number) => {
@@ -236,6 +264,7 @@ const LoadPage = () => {
                   { value: 20, label: '20 / page' },
                   { value: 50, label: '50 / page' },
                 ]}
+                classNames={selectClassNames}
                 style={{ width: 120 }}
               />
             </div>

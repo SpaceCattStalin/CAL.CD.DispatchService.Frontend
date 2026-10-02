@@ -1,5 +1,3 @@
-import React from 'react';
-
 type GeneralInfoTabProps = {
     pickupLocation: string,
     dropoffLocation: string,

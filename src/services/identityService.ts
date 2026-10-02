@@ -1,4 +1,4 @@
-import { authInstance } from "./axiosInstance";
+import axiosInstance from "./axiosInstance";
 
 type LoginRequest = {
     userName: string,
@@ -11,7 +11,7 @@ export type LoginResponse = {
 };
 
 export const login = async (request: LoginRequest): Promise<LoginResponse> => {
-    const response = await authInstance.post<LoginResponse>('/auth/login', request);
+    const response = await axiosInstance.post<LoginResponse>('/auth/login', request);
     if (response.status != 200) {
         throw new Error(`Login failed with status ${response.status}`);
     }

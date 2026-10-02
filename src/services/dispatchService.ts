@@ -189,6 +189,8 @@ const toLoadProps = (dispatch: getDispatchResponse): LoadProps => {
         listingCreatedAt: new Date(dispatch.createdAt),
         listingUpdatedAt: new Date(dispatch.createdAt),
         price: dispatch.price,
+
+        createdAt: new Date(dispatch.createdAt)
     };
 };
 

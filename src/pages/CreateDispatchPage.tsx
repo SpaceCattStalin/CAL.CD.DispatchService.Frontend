@@ -4,6 +4,7 @@ import { message } from 'antd';
 import DispatchForm from '../components/common/DispatchForm';
 import type { DispatchFormValues } from '../components/common/DispatchForm';
 import { createDispatch, toCreateDispatchRequest } from '../services/dispatchService';
+import { getProblemDetails, getErrorText } from '../types/ApiError';
 
 const CreateDispatchPage = () => {
     const navigate = useNavigate();
@@ -32,8 +33,15 @@ const CreateDispatchPage = () => {
 
             const { location } = await createDispatch(toCreateDispatchRequest(values));
             navigate(location);
-        } catch {
-            message.error('Failed to create dispatch');
+        } catch (ex) {
+            const problem = getProblemDetails(ex);
+            switch (problem?.status) {
+                case 403:
+                    message.error("Forbidden for this action");
+                    break;
+                default:
+                    message.error(getErrorText(problem, 'Failed to create dispatch'));
+            }
         } finally {
             setSubmitting(false);
         }
